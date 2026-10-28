@@ -1,0 +1,241 @@
+/* Menú lateral: riel de iconos que se despliega como panel. --rail (ancho colapsado) lo define el armazón. */
+
+.rail {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 25;
+  width: var(--rail);
+}
+
+.panel {
+  --box: calc(var(--rail) - 28px);
+  position: absolute;
+  inset: 0 auto 0 0;
+  display: flex;
+  flex-direction: column;
+  width: var(--rail);
+  padding: 16px 14px;
+  overflow: hidden;
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+  transition: width 400ms var(--ease-out), box-shadow 400ms var(--ease-out), border-radius 400ms var(--ease-out);
+}
+
+.open {
+  width: 252px;
+  border-radius: 0 28px 28px 0;
+  box-shadow: 22px 0 60px rgb(20 26 36 / 0.16);
+}
+
+/* Caja del icono: siempre ocupa el ancho del riel colapsado, así los iconos no se mueven al desplegar */
+.iconBox {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--box);
+  height: 48px;
+}
+
+.iconBox svg { transition: transform 360ms var(--ease-out), color var(--t-base) var(--ease-out); }
+
+/* ── Marca ── */
+.brand {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.brand:hover { text-decoration: none; }
+.brand .iconBox { height: 52px; }
+.brand:hover .iconBox svg { transform: rotate(-8deg) scale(1.06); }
+
+.brandText, .label {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  white-space: nowrap;
+  line-height: 1.2;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity 180ms var(--ease-out), transform 260ms var(--ease-out);
+}
+
+.brandText strong { font-size: var(--fs-text); font-weight: 800; letter-spacing: -0.02em; }
+.brandText small, .label small { font-size: 11.5px; color: var(--muted); }
+.label { font-size: var(--fs-body); font-weight: 700; }
+.label strong { font-size: var(--fs-body); font-weight: 700; overflow: hidden; text-overflow: ellipsis; }
+
+.open .brandText, .open .label {
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(110ms + var(--i, 0) * 28ms);
+  transition-duration: 280ms, 380ms;
+}
+
+/* ── Lista ── */
+.list { display: grid; gap: 2px; margin: 8px 0 0; padding: 0; list-style: none; }
+.items { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+
+.groupLabel {
+  position: relative;
+  display: block;
+  height: 26px;
+  margin-top: 6px;
+}
+
+/* Colapsado: una rayita; desplegado: el nombre del grupo */
+.groupLabel::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: calc(var(--box) / 2 - 9px);
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--border);
+  transition: opacity 160ms var(--ease-out);
+}
+
+.groupLabel span {
+  position: absolute;
+  top: 5px;
+  left: 6px;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--faint);
+  opacity: 0;
+  transition: opacity 200ms var(--ease-out);
+}
+
+.open .groupLabel::before { opacity: 0; }
+.open .groupLabel span { opacity: 1; transition-delay: 140ms; }
+
+/* ── Secciones ── */
+.item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 48px;
+  border-radius: 15px;
+  color: var(--muted);
+  text-decoration: none;
+  transition: background-color var(--t-base) var(--ease-out), color var(--t-base) var(--ease-out), transform var(--t-fast) var(--ease-out);
+}
+
+.item:hover { background: color-mix(in srgb, var(--t) 12%, var(--surface)); color: var(--t); text-decoration: none; }
+.item:hover .iconBox svg { transform: scale(1.14) rotate(-7deg); }
+.item:active { transform: scale(0.97); }
+.item:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.item .label { color: inherit; }
+
+.item[aria-current='page'] { color: var(--inverse); }
+.item[aria-current='page']:hover { background: transparent; color: var(--inverse); }
+
+/* Píldora de color de la sección elegida; se desliza entre secciones */
+.pill {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 15px;
+  background: var(--t);
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--t) 38%, transparent);
+}
+
+/* Contador: sobre el icono al colapsar, a la derecha al desplegar */
+.badge {
+  position: absolute;
+  z-index: 2;
+  top: 4px;
+  left: calc(var(--box) - 22px);
+  display: grid;
+  place-items: center;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 5px;
+  border-radius: 10px;
+  background: var(--pink);
+  box-shadow: 0 0 0 2px var(--surface);
+  color: var(--inverse);
+  font-size: 10.5px;
+  font-weight: 800;
+  transition: top 300ms var(--ease-out), left 400ms var(--ease-out), box-shadow 300ms var(--ease-out);
+}
+
+.open .badge { top: calc(50% - 9.5px); left: calc(100% - 40px); box-shadow: none; }
+.item[aria-current='page'] .badge { background: var(--surface); color: var(--pink); }
+
+/* ── Pie: perfil y salida ── */
+.foot { display: grid; gap: 4px; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border); }
+
+.me, .logout {
+  display: flex;
+  align-items: center;
+  height: 52px;
+  border: 0;
+  border-radius: 15px;
+  background: transparent;
+  color: var(--muted);
+  text-align: left;
+  text-decoration: none;
+  transition: background-color var(--t-base) var(--ease-out), color var(--t-base) var(--ease-out), transform var(--t-fast) var(--ease-out);
+}
+
+.me:hover { background: var(--panel-row); color: var(--text); text-decoration: none; }
+.meActive { background: var(--accent-soft); color: var(--accent-ink); }
+.logout:hover { background: var(--pill-negative-bg); color: var(--pill-negative-ink); }
+.logout:hover .iconBox svg { transform: translateX(3px); }
+.me:active, .logout:active { transform: scale(0.97); }
+.me:focus-visible, .logout:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.logout:disabled { opacity: 0.55; }
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--pink);
+  color: var(--inverse);
+  font-size: 13px;
+  font-weight: 800;
+  box-shadow: 0 6px 14px color-mix(in srgb, var(--pink) 35%, transparent);
+  transition: transform 360ms var(--ease-out);
+}
+
+.me:hover .avatar { transform: scale(1.08) rotate(-6deg); }
+.me .label { color: inherit; }
+
+/* ── Puntos de quiebre ── */
+@media (min-width: 1920px) {
+  .panel { padding-inline: 14px; }
+  .open { width: 272px; }
+  .item { height: 52px; }
+  .iconBox { height: 52px; }
+}
+
+@media (max-height: 860px) and (min-width: 1101px) {
+  .panel { padding-block: 12px; }
+  .item, .iconBox { height: 44px; }
+  .brand .iconBox { height: 48px; }
+  .me, .logout { height: 46px; }
+}
+
+@media (max-height: 640px) and (min-width: 1101px) {
+  .groupLabel { height: 16px; margin-top: 2px; }
+  .groupLabel span { top: 1px; }
+  .groupLabel::before { top: 7px; }
+  .brandText small { display: none; }
+}
+
+/* El riel se pliega a la hoja de navegación */
+@media (max-width: 1100px) {
+  .rail { display: none; }
+}

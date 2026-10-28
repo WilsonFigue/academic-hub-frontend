@@ -1,16 +1,15 @@
-import * as Tooltip from '@radix-ui/react-tooltip';
 import {
   BellRing, BookOpen, CalendarDays, ClipboardList, GraduationCap, House, LogOut, Menu, UserRound, X, type LucideIcon,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useReducedMotion } from '../lib/motion';
 import { useEffect, useState, type ReactNode } from 'react';
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useDashboard, useLogout, useMe, useSession, useTerms } from '../api/hooks';
 import { syncStatus } from '../lib/status';
 import { CommandPalette } from './CommandPalette';
 import { TopBar } from './TopBar';
-import { LogoMark } from './Logo';
+import { SideRail } from './SideRail';
 import styles from './AppShell.module.css';
 
 type Item = { to: string; label: string; icon: LucideIcon };
@@ -29,23 +28,15 @@ function initials(name: string | null | undefined, fallback: string) {
   return parts.length ? (parts[0]![0]! + (parts[1]?.[0] ?? '')).toUpperCase() : fallback.slice(0, 2).toUpperCase();
 }
 
-function RailLink({ item, active, layoutId, onClick, showLabel }: { item: Item; active: boolean; layoutId: string; onClick?: () => void; showLabel?: boolean }) {
+/** Enlace de la hoja de navegación (≤1100 px): icono y etiqueta; la elegida lleva una píldora que se desliza. */
+function SheetLink({ item, active, onClick }: { item: Item; active: boolean; onClick?: () => void }) {
   const Icon = item.icon;
-  const link = (
-    <NavLink to={item.to} className={styles.railItem} onClick={onClick} aria-label={showLabel ? undefined : item.label}>
-      {active && <motion.span layoutId={layoutId} className={styles.railActive} transition={{ type: 'spring', stiffness: 480, damping: 38 }} />}
-      <Icon size={22} strokeWidth={active ? 2.2 : 1.8} aria-hidden="true" />
-      {showLabel && <span>{item.label}</span>}
-    </NavLink>
-  );
-  if (showLabel) return link;
   return (
-    <Tooltip.Root delayDuration={120}>
-      <Tooltip.Trigger asChild>{link}</Tooltip.Trigger>
-      <Tooltip.Portal>
-        <Tooltip.Content side="right" sideOffset={10} className={styles.tooltip}>{item.label}<Tooltip.Arrow className={styles.tooltipArrow} /></Tooltip.Content>
-      </Tooltip.Portal>
-    </Tooltip.Root>
+    <NavLink to={item.to} className={styles.railItem} onClick={onClick}>
+      {active && <motion.span layoutId="sheet-active" className={styles.railActive} transition={{ type: 'spring', stiffness: 480, damping: 38 }} />}
+      <Icon size={22} strokeWidth={active ? 2.2 : 1.8} aria-hidden="true" />
+      <span>{item.label}</span>
+    </NavLink>
   );
 }
 
@@ -74,34 +65,24 @@ export function AppShell({ children }: { children: ReactNode }) {
     return () => { document.body.style.overflow = ''; };
   }, [sheet]);
 
+  // Grupos del menú lateral, cada sección con su color; los contadores salen de datos reales del Inicio.
+  const pending = dashboard.data?.summary.pending ?? 0;
+  const news = dashboard.data?.recentChanges.length ?? 0;
+  const railGroups = [
+    { label: 'Estudio', items: [
+      { ...PRIMARY[0]!, tone: 'var(--accent)' }, { ...PRIMARY[1]!, tone: 'var(--teal)' },
+      { ...PRIMARY[2]!, tone: 'var(--sky)', badge: pending }, { ...PRIMARY[3]!, tone: 'var(--amber)' },
+    ] },
+    { label: 'Seguimiento', items: [{ ...PRIMARY[4]!, tone: 'var(--mint)' }, { ...PRIMARY[5]!, tone: 'var(--pink)', badge: news }] },
+  ];
+
   const signOut = () => logout.mutate(undefined, { onSettled: () => navigate('/login', { replace: true }) });
 
   return (
-    <Tooltip.Provider>
       <div className={styles.shell}>
-        {/* Riel de iconos (≥1101) */}
-        <nav className={styles.rail} aria-label="Principal">
-          <Link to="/dashboard" className={styles.railLogo} aria-label="Hoy"><LogoMark size={36} /></Link>
-          <div className={styles.railItems}>
-            {PRIMARY.map((item) => <RailLink key={item.to} item={item} active={isActive(item.to)} layoutId="rail-active" />)}
-          </div>
-          <div className={styles.railFoot}>
-            <Tooltip.Root delayDuration={120}>
-              <Tooltip.Trigger asChild>
-                <Link to="/profile" className={`${styles.avatar} ${isActive('/profile') ? styles.avatarActive : ''}`} aria-label="Mi perfil">
-                  {initials(user?.displayName, user?.username ?? user?.email ?? 'AH')}
-                </Link>
-              </Tooltip.Trigger>
-              <Tooltip.Portal><Tooltip.Content side="right" sideOffset={10} className={styles.tooltip}>Mi perfil<Tooltip.Arrow className={styles.tooltipArrow} /></Tooltip.Content></Tooltip.Portal>
-            </Tooltip.Root>
-            <Tooltip.Root delayDuration={120}>
-              <Tooltip.Trigger asChild>
-                <button type="button" className={styles.railLogout} onClick={signOut} aria-label="Cerrar sesión" disabled={logout.isPending}><LogOut size={20} aria-hidden="true" /></button>
-              </Tooltip.Trigger>
-              <Tooltip.Portal><Tooltip.Content side="right" sideOffset={10} className={styles.tooltip}>Cerrar sesión<Tooltip.Arrow className={styles.tooltipArrow} /></Tooltip.Content></Tooltip.Portal>
-            </Tooltip.Root>
-          </div>
-        </nav>
+        {/* Menú lateral (≥1101) */}
+        <SideRail groups={railGroups} isActive={isActive} name={user?.displayName ?? user?.username ?? 'Mi cuenta'} initials={initials(user?.displayName, user?.username ?? user?.email ?? 'AH')}
+          profileActive={isActive('/profile')} onLogout={signOut} loggingOut={logout.isPending} />
 
         {/* Barra superior */}
         <TopBar term={term} institution={account?.institutionCode} lastImport={lastImport} syncLabel={sync.label} syncTone={sync.tone}
@@ -125,7 +106,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </div>
                 <div className={styles.sheetItems}>
                   {[...PRIMARY, { to: '/profile', label: 'Mi perfil', icon: UserRound }].map((item) => (
-                    <RailLink key={item.to} item={item} active={isActive(item.to)} layoutId="sheet-active" showLabel onClick={() => setSheet(false)} />
+                    <SheetLink key={item.to} item={item} active={isActive(item.to)} onClick={() => setSheet(false)} />
                   ))}
                 </div>
                 <button type="button" className={styles.sheetLogout} onClick={signOut}><LogOut size={18} aria-hidden="true" />Cerrar sesión</button>
@@ -163,6 +144,5 @@ export function AppShell({ children }: { children: ReactNode }) {
 
         <CommandPalette open={palette} onOpenChange={setPalette} />
       </div>
-    </Tooltip.Provider>
   );
 }
