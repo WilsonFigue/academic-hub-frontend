@@ -14,7 +14,7 @@ import { CourseTabs } from '../components/CourseTabs';
 import { TermRibbon } from '../components/TermRibbon';
 import { Button, Card, EmptyState, Skeleton } from '../components/ui';
 import { tintColor } from '../lib/colors';
-import { LOW_THRESHOLD, pctOf, type DashStatus } from '../lib/dashFilters';
+import { LOW_THRESHOLD, matchesStatus, pctOf, type DashStatus } from '../lib/dashFilters';
 import { capitalize, courseTitle, formatLongDay, formatScore, greeting } from '../lib/format';
 import { statusGroup, type StatusGroup } from '../lib/status';
 import { tintFor } from '../lib/tint';
@@ -119,7 +119,7 @@ export function DashboardPage() {
   const byId = useMemo(() => new Map(all.map((a) => [a.id, a])), [all]);
   const base = useMemo(() => (viewCourse ? all.filter((a) => a.courseId === viewCourse) : all), [all, viewCourse]);
 
-  const count = (group: StatusGroup) => base.filter((a) => statusGroup(a) === group).length;
+  const count = (group: StatusGroup) => base.filter((a) => matchesStatus(a, group as DashStatus)).length;
   const gradedBase = useMemo(() => base.filter((a) => statusGroup(a) === 'graded' && pctOf(a) !== null && (a.score !== null || a.isAutoZero))
     .sort((x, y) => (Date.parse(y.gradedAt ?? y.dueAt ?? '') || 0) - (Date.parse(x.gradedAt ?? x.dueAt ?? '') || 0)), [base]);
   const low = gradedBase.filter((a) => (pctOf(a) ?? 100) < LOW_THRESHOLD).length;
@@ -173,13 +173,13 @@ export function DashboardPage() {
       {ribbonTerm && (
         <motion.div className={styles.deck} {...enter(0.08)}>
           <CourseTabs courses={data.courses} value={courseId} onChange={chooseCourse} onPreview={previewCourse} />
-          <TermRibbon term={ribbonTerm} activities={all} onOpen={setSelected} status={viewStatus} onStatus={toggleStatus as (s: DashStatus) => void} onPreview={previewStatus} courseId={viewCourse} />
+          <TermRibbon term={ribbonTerm} activities={all} onOpen={setSelected} status={status} preview={hoverStatus} onStatus={toggleStatus as (s: DashStatus) => void} onPreview={previewStatus} courseId={viewCourse} />
         </motion.div>
       )}
 
       <div className={styles.grid}>
         <Cell className={styles.cal} delay={0.16} eager>
-          <Card padded={false} className={styles.card} aria-labelledby="cal-title"><CalendarCard onOpen={setSelected} byId={byId} status={viewStatus} courseId={viewCourse} scope={<ScopeTag course={course} />} /></Card>
+          <Card padded={false} className={styles.card} aria-labelledby="cal-title"><CalendarCard onOpen={setSelected} byId={byId} status={viewStatus} courseId={viewCourse} scope={<ScopeTag course={course} status={viewStatus} />} /></Card>
         </Cell>
 
         <Cell className={styles.est} delay={0.22}>
@@ -194,7 +194,7 @@ export function DashboardPage() {
         <Cell className={styles.not} delay={0.28}>
           <Card padded={false} className={styles.card} aria-labelledby="not-title">
             <div className={styles.cardHead}>
-              <div><div className={styles.titleRow}><h2 id="not-title" className={styles.cardTitle}>Últimas notas</h2><ScopeTag course={course} /></div><p className={styles.cardSub}>{viewStatus === 'low' ? 'Solo las notas bajas.' : `Las ${narrow ? 6 : 10} más recientes. Toca una columna para abrirla.`}</p></div>
+              <div><div className={styles.titleRow}><h2 id="not-title" className={styles.cardTitle}>Últimas notas</h2><ScopeTag course={course} status={viewStatus === 'low' || viewStatus === 'graded' ? viewStatus : undefined} /></div><p className={styles.cardSub}>{viewStatus === 'low' ? 'Solo las notas bajas.' : `Las ${narrow ? 6 : 10} más recientes. Toca una columna para abrirla.`}</p></div>
               <div className={styles.stats}>
                 {average !== null && <motion.span className={styles.stat} title="Promedio simple de las notas publicadas. No es un promedio oficial ni el CUM." initial={reduce ? false : { opacity: 0, y: 10, scale: 0.9 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.15, ease }}><Sigma size={14} aria-hidden="true" />Promedio simple <b>{average} %</b><i>no oficial</i></motion.span>}
                 {best !== null && <motion.span className={cx(styles.stat, styles.statBest)} initial={reduce ? false : { opacity: 0, y: 10, scale: 0.9 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.25, ease }}><Trophy size={14} aria-hidden="true" />Mejor <b>{best} %</b></motion.span>}

@@ -1,4 +1,4 @@
-.slot { position: relative; display: inline-flex; min-width: 0; max-width: 100%; }
+.slot { position: relative; display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; max-width: 100%; }
 
 .tag {
   display: inline-flex;
@@ -26,3 +26,7 @@
 }
 
 .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Etiqueta de estado: punto del color del estado sobre fondo suave */
+.status { padding-left: 10px; background: color-mix(in srgb, var(--c) 12%, var(--surface)); }
+.dot { width: 9px; height: 9px; flex: none; border-radius: 50%; background: var(--c); }

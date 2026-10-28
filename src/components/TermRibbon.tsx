@@ -70,9 +70,11 @@ function NextPill({ activity, onOpen }: { activity: Activity; onOpen: (id: strin
  * rojo si venció sin nota o fue cero automático; verde si ya tiene nota; azul si está entregada).
  * Responde a los filtros globales del Inicio (estado y materia). Clic en una marca abre la actividad.
  */
-export function TermRibbon({ term, activities, onOpen, status, onStatus, onPreview, courseId }: {
-  term: Term; activities: Activity[]; onOpen: (id: string) => void; status: DashStatus; onStatus: (status: DashStatus) => void; onPreview?: (status: DashStatus | null) => void; courseId: string;
+export function TermRibbon({ term, activities, onOpen, status, preview, onStatus, onPreview, courseId }: {
+  term: Term; activities: Activity[]; onOpen: (id: string) => void; status: DashStatus; preview?: DashStatus | null; onStatus: (status: DashStatus) => void; onPreview?: (status: DashStatus | null) => void; courseId: string;
 }) {
+  // `status` es el filtro ELEGIDO (clic); `preview` es solo lo que se ve mientras el mouse pasa por un chip.
+  const active = preview ?? status;
   const reduce = useReducedMotion();
   const start = term.startAt ? Date.parse(term.startAt) : NaN;
   const end = term.endAt ? Date.parse(term.endAt) : NaN;
@@ -90,11 +92,11 @@ export function TermRibbon({ term, activities, onOpen, status, onStatus, onPrevi
       return { activity: a, at, position: (at - start) / (end - start), group: statusGroup(a) };
     }).filter((m) => m.position >= 0 && m.position <= 1).sort((a, b) => a.at - b.at);
   }, [activities, valid, start, end, term.id, courseId]);
-  const shown = markers.filter((m) => matchesStatus(m.activity, status));
-  const filtered = status !== 'all' || courseId !== '';
+  const shown = markers.filter((m) => matchesStatus(m.activity, active));
+  const filtered = active !== 'all' || courseId !== '';
   const counts: Record<Exclude<DashStatus, 'all' | 'nodate'>, number> = {
-    graded: markers.filter((m) => m.group === 'graded').length, overdue: markers.filter((m) => m.group === 'overdue').length,
-    submitted: markers.filter((m) => m.group === 'submitted').length, pending: markers.filter((m) => m.group === 'pending').length,
+    graded: markers.filter((m) => matchesStatus(m.activity, 'graded')).length, overdue: markers.filter((m) => matchesStatus(m.activity, 'overdue')).length,
+    submitted: markers.filter((m) => matchesStatus(m.activity, 'submitted')).length, pending: markers.filter((m) => matchesStatus(m.activity, 'pending')).length,
     low: markers.filter((m) => matchesStatus(m.activity, 'low')).length,
   };
 
@@ -160,7 +162,7 @@ export function TermRibbon({ term, activities, onOpen, status, onStatus, onPrevi
           <span className="tabular">{formatDate(term.startAt)}</span>
           <div className={styles.filters} role="group" aria-label="Filtrar por estado">
             {FILTERS.filter((item) => counts[item.key] > 0 || status === item.key).map((item) => (
-              <button key={item.key} type="button" className={styles.filter} aria-pressed={status === item.key} onClick={() => onStatus(status === item.key ? 'all' : item.key)}
+              <button key={item.key} type="button" className={styles.filter} aria-pressed={status === item.key} data-preview={preview === item.key && status !== item.key} onClick={() => onStatus(status === item.key ? 'all' : item.key)}
                 style={{ ['--d' as string]: item.dot }} onPointerLeave={() => onPreview?.(null)}
                 onPointerEnter={(event) => { if (event.pointerType === 'mouse') onPreview?.(item.key); }}
                 onFocus={(event) => { if (event.currentTarget.matches(':focus-visible')) onPreview?.(item.key); }} onBlur={() => onPreview?.(null)}>

@@ -14,9 +14,25 @@ export function pctOf(activity: Activity): number | null {
   return Math.min(100, (Number(activity.score ?? 0) / max) * 100);
 }
 
+/** Nombre y color de cada estado (se usan en las etiquetas de las tarjetas filtradas). */
+export const STATUS_INFO: Record<Exclude<DashStatus, 'all'>, { label: string; color: string }> = {
+  pending: { label: 'Por entregar', color: 'var(--st-pending-ink)' },
+  overdue: { label: 'Vencidas o cero', color: 'var(--bad)' },
+  submitted: { label: 'Entregadas', color: 'var(--sky)' },
+  graded: { label: 'Calificadas', color: 'var(--ok)' },
+  low: { label: 'Notas bajas', color: 'var(--bad)' },
+  nodate: { label: 'Sin fecha', color: 'var(--faint)' },
+};
+
+/**
+ * Pertenencia a un estado. Un cero automático es una entrega vencida (se pinta en rojo), así que cuenta en "vencidas o
+ * cero" y no en "calificadas"; así los números de los chips, del pastel y de las marcas cuadran entre sí.
+ */
 export function matchesStatus(activity: Activity, status: DashStatus): boolean {
   if (status === 'all') return true;
   const group = statusGroup(activity);
+  if (status === 'overdue') return group === 'overdue' || activity.isAutoZero;
+  if (status === 'graded') return group === 'graded' && !activity.isAutoZero;
   if (status === 'low') {
     const pct = pctOf(activity);
     return group === 'graded' && pct !== null && pct < LOW_THRESHOLD;

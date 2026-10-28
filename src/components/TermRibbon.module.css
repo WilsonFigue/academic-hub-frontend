@@ -311,6 +311,9 @@
 .filter[aria-pressed='true'] { background: var(--text); color: var(--inverse); }
 .filter[aria-pressed='true'] .dot { box-shadow: 0 0 0 2px rgb(255 255 255 / 0.9); }
 .filter[aria-pressed='true'] .dotHollow { box-shadow: inset 0 0 0 2.5px #fff; }
+/* Vista previa (solo mouse encima): un anillo, sin parecer elegido */
+.filter[data-preview='true'] { color: var(--text); box-shadow: inset 0 0 0 1.5px var(--text); transform: translateY(-1px); }
+
 .filter:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 
 /* ── Adaptación según el ancho de la propia tarjeta ── */
