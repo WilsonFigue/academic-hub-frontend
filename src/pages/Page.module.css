@@ -1,0 +1,666 @@
+/* Estructura común de pantallas (v2). Paneles tonales sin sombra; color solo en los datos. */
+
+/* ── Encabezado de detalle (materia) ── */
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px 24px;
+  margin-bottom: 28px;
+}
+
+.title {
+  font-size: var(--fs-title);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.lede {
+  margin-top: 6px;
+  max-width: 64ch;
+  font-size: var(--fs-text);
+  color: var(--muted);
+}
+
+.courseHead {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.courseHeadMark {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  font-size: var(--fs-section);
+  font-weight: 700;
+}
+
+/* Metadatos como texto gris separado por puntos, no como chips */
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 0;
+  margin-top: 10px;
+  font-size: var(--fs-body);
+  color: var(--muted);
+}
+
+.metaChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  overflow-wrap: anywhere;
+}
+
+.metaChip + .metaChip::before {
+  content: '·';
+  margin: 0 10px;
+  color: var(--faint);
+}
+
+.metaChip svg {
+  display: none;
+}
+
+/* ── Inicio: bloque hero en violeta con el saludo y los indicadores ── */
+.hero {
+  position: relative;
+  margin-bottom: var(--gap);
+  padding: 32px var(--pad) 28px;
+  border-radius: var(--radius-panel);
+  background: linear-gradient(135deg, var(--hero-bg), var(--hero-bg-2));
+  color: var(--hero-ink);
+  box-shadow: 0 16px 40px rgb(20 26 36 / 0.18);
+  overflow: hidden;
+}
+
+/* Dos círculos de luz que flotan en el fondo */
+.hero::before,
+.hero::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: float 9s ease-in-out infinite alternate;
+}
+
+.hero::before {
+  width: 360px;
+  height: 360px;
+  right: -120px;
+  top: -160px;
+  background: rgb(255 255 255 / 0.12);
+}
+
+.hero::after {
+  width: 220px;
+  height: 220px;
+  left: 40%;
+  bottom: -150px;
+  background: rgb(255 209 102 / 0.22);
+  animation-delay: -4s;
+}
+
+@keyframes float {
+  to {
+    transform: translate3d(-24px, 18px, 0) scale(1.08);
+  }
+}
+
+.hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.greeting {
+  margin-bottom: 28px;
+}
+
+.greetingTitle {
+  max-width: 30ch;
+  font-size: var(--fs-greeting);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.greetingTitle em {
+  font-style: normal;
+  color: var(--hero-muted);
+}
+
+.greetingFact {
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  color: #ffd166;
+  text-decoration: underline;
+  text-decoration-color: rgb(255 209 102 / 0.5);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+  transition: text-decoration-color var(--t-fast) var(--ease-out);
+}
+
+.greetingFact:hover {
+  text-decoration-color: #ffd166;
+}
+
+.hero .metaRow {
+  color: var(--hero-muted);
+}
+
+.hero .metaChip + .metaChip::before {
+  color: var(--hero-muted);
+}
+
+/* ── Indicadores: celdas translúcidas dentro del hero, cifras grandes ── */
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.kpi {
+  display: grid;
+  gap: 2px;
+  align-content: start;
+  min-width: 0;
+  padding: 14px 16px;
+  border-radius: var(--radius-row);
+  background: var(--hero-cell);
+  transition: background-color var(--t-base) var(--ease-out), transform var(--t-base) var(--ease-out);
+}
+
+.kpi:hover {
+  background: rgb(255 255 255 / 0.22);
+  transform: translateY(-2px);
+}
+
+.kpiValue {
+  font-size: var(--fs-figure);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.kpiLabel {
+  font-size: var(--fs-body);
+  font-weight: 600;
+}
+
+.kpiHint {
+  font-size: var(--fs-meta);
+  color: var(--hero-muted);
+}
+
+.kpiAlert .kpiValue {
+  color: #ffd166;
+}
+
+/* ── Rejillas de 12 columnas ── */
+.section {
+  margin-top: var(--section-gap);
+}
+
+.grid {
+  display: grid;
+  gap: var(--gap);
+}
+
+.grid93,
+.grid66 {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--gap);
+  align-items: start;
+  margin-top: var(--gap);
+}
+
+.grid93 > :first-child { grid-column: span 8; }
+.grid93 > :last-child { grid-column: span 4; }
+.grid66 > * { grid-column: span 6; }
+.grid66 > :only-child { grid-column: 1 / -1; }
+
+.stack {
+  display: grid;
+  gap: var(--gap);
+}
+
+.courseGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: 14px;
+}
+
+/* ── Semana: siete días como filas ── */
+.week {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.weekDay {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 10px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.weekDay:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.weekLabel {
+  display: grid;
+  line-height: 1.15;
+  font-size: var(--fs-meta);
+  color: var(--muted);
+}
+
+.weekLabel strong {
+  font-size: var(--fs-text);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.weekToday .weekLabel,
+.weekToday .weekLabel strong {
+  color: var(--accent-ink);
+}
+
+.weekItems {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.weekItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: 28px;
+  padding: 0 8px;
+  margin-left: -8px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  font-size: var(--fs-body);
+  text-align: left;
+  transition: background-color var(--t-fast) var(--ease-out);
+}
+
+button.weekItem:hover {
+  background: var(--hover);
+}
+
+.weekItem .dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.weekItem .label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.weekItem time {
+  flex: none;
+  color: var(--faint);
+  font-size: var(--fs-meta);
+  font-variant-numeric: tabular-nums;
+}
+
+.weekEmpty {
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  font-size: var(--fs-body);
+  color: var(--faint);
+}
+
+/* ── Materias en filas (Inicio) ── */
+.courseRows {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.courseRow {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  min-height: var(--row-h);
+  padding: 10px 16px 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-row);
+  background: var(--panel);
+  box-shadow: var(--shadow-card);
+  color: inherit;
+  text-decoration: none;
+  transition: box-shadow var(--t-base) var(--ease-out), transform var(--t-base) var(--ease-out), border-color var(--t-base) var(--ease-out);
+}
+
+.courseRow:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-soft);
+  box-shadow: var(--shadow-lift);
+  color: inherit;
+}
+
+.courseRow:active {
+  transform: scale(0.995);
+}
+
+.courseMark {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  font-size: var(--fs-body);
+  font-weight: 700;
+}
+
+.courseName {
+  font-size: var(--fs-text);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.courseMeta {
+  font-size: var(--fs-meta);
+  color: var(--muted);
+}
+
+.courseNext {
+  text-align: right;
+  font-size: var(--fs-body);
+  font-variant-numeric: tabular-nums;
+}
+
+.courseNext span {
+  display: block;
+  font-size: var(--fs-meta);
+  color: var(--muted);
+}
+
+/* ── Avisos ── */
+.notice {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border-radius: var(--radius-row);
+  background: var(--panel);
+  font-size: var(--fs-body);
+}
+
+.notice svg {
+  flex: none;
+  width: 20px;
+  height: 20px;
+}
+
+.noticeSuccess {
+  background: var(--pill-positive-bg);
+  color: var(--pill-positive-ink);
+}
+
+.noticeWarning {
+  background: var(--pill-warning-bg);
+  color: var(--pill-warning-ink);
+}
+
+.noticeDanger {
+  background: var(--pill-negative-bg);
+  color: var(--pill-negative-ink);
+}
+
+/* ── Pestañas: subrayado que se desliza ── */
+.tabs {
+  position: relative;
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  position: relative;
+  flex: none;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: var(--fs-body);
+  font-weight: 600;
+  transition: color var(--t-fast) var(--ease-out);
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tab[aria-selected='true'] {
+  color: var(--accent-ink);
+}
+
+.tabLine {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -1px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
+.tabCount {
+  margin-left: 6px;
+  color: var(--faint);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Listas de definición ── */
+.dl {
+  display: grid;
+  gap: 18px 32px;
+  margin: 0;
+}
+
+.dl div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.dl dt {
+  font-size: var(--fs-meta);
+  color: var(--muted);
+}
+
+.dl dd {
+  margin: 0;
+  font-size: var(--fs-text);
+  overflow-wrap: anywhere;
+}
+
+.note {
+  margin-top: 20px;
+  max-width: 68ch;
+  font-size: var(--fs-body);
+  color: var(--muted);
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--muted);
+}
+
+.backLink:hover {
+  color: var(--text);
+}
+
+.backLink svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ── Puntos de quiebre ── */
+@media (min-width: 768px) {
+  .dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1365px) {
+  .grid93 > :first-child { grid-column: span 7; }
+  .grid93 > :last-child { grid-column: span 5; }
+}
+
+@media (max-width: 1100px) {
+  .grid93 > *,
+  .grid93 > :first-child,
+  .grid93 > :last-child,
+  .grid66 > * {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 900px) {
+  .kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 581px) {
+  .greeting {
+    margin-bottom: 24px;
+  }
+
+  .hero {
+    padding: 24px 16px 20px;
+  }
+
+  .kpi {
+    padding: 12px 14px;
+  }
+
+  .courseHeadMark {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    font-size: var(--fs-text);
+  }
+
+  .courseRow {
+    grid-template-columns: 36px minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .courseMark {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+
+  .courseNext {
+    grid-column: 2;
+    text-align: left;
+  }
+
+  .courseNext span {
+    display: inline;
+    margin-left: 6px;
+  }
+}
+
+@media (max-width: 390px) {
+  .kpiValue {
+    font-size: 24px;
+  }
+}
+
+@media (max-height: 860px) and (min-width: 1101px) {
+  .greeting {
+    margin-bottom: 20px;
+  }
+
+  .hero {
+    padding-block: 24px 20px;
+  }
+}
+
+/* Avance de notas publicadas por materia (dato real: publicadas / evaluables) */
+.progress {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--fs-meta);
+  color: var(--muted);
+}
+
+.progressTrack {
+  width: 72px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--pill-neutral-bg);
+  overflow: hidden;
+}
+
+.progressFill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), var(--pink));
+  transform-origin: left center;
+}
+
+@media (max-width: 500px) {
+  .progressTrack {
+    display: none;
+  }
+}

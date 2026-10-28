@@ -1,0 +1,193 @@
+/* Botón flotante de materias: abanico hacia arriba. Por encima del contenido (z 30), por debajo de los paneles de detalle. */
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 28;
+  border: 0;
+  background: rgb(20 26 36 / 0.22);
+  backdrop-filter: blur(3px);
+}
+
+.dial {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 14px;
+  max-width: calc(100vw - 32px);
+}
+
+.list {
+  display: grid;
+  gap: 10px;
+  justify-items: end;
+  max-height: calc(100dvh - 150px);
+  margin: 0;
+  padding: 4px 2px;
+  overflow-y: auto;
+  list-style: none;
+  scrollbar-width: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.item {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(330px, calc(100vw - 144px));
+  padding: 8px 18px 8px 8px;
+  border: 1.5px solid transparent;
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: var(--shadow-lift);
+  color: var(--text);
+  text-align: left;
+  transition: transform var(--t-base) var(--ease-out), border-color var(--t-base) var(--ease-out), background-color var(--t-base) var(--ease-out);
+}
+
+.item:hover { transform: translateX(-4px); border-color: var(--c, var(--text)); }
+.item:active { transform: scale(0.98); }
+
+.itemOn {
+  border-color: var(--c);
+  background: color-mix(in srgb, var(--c) 8%, var(--surface));
+}
+
+.itemIcon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: var(--c, var(--text));
+  color: var(--inverse);
+  box-shadow: 0 6px 14px color-mix(in srgb, var(--c, var(--text)) 35%, transparent);
+  transition: transform var(--t-base) var(--ease-out);
+}
+
+.item:hover .itemIcon { transform: rotate(-8deg) scale(1.06); }
+
+.itemText {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 1px;
+  line-height: 1.25;
+}
+
+.itemText strong {
+  overflow: hidden;
+  font-size: var(--fs-body);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.itemText small {
+  overflow: hidden;
+  font-size: 11.5px;
+  color: var(--muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.itemCheck { flex: none; color: var(--c); }
+.itemAll { --c: var(--text); }
+
+/* Accesos rápidos de la materia */
+.act {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  color: var(--muted);
+  transition: transform var(--t-fast) var(--ease-out), background-color var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out);
+}
+
+.act:hover {
+  transform: translateY(-2px);
+  background: var(--text);
+  color: var(--inverse);
+  text-decoration: none;
+}
+
+/* Botón principal */
+.fab {
+  --c: var(--text);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 58px;
+  padding: 0 24px 0 8px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--c);
+  box-shadow: 0 14px 30px color-mix(in srgb, var(--c) 40%, transparent);
+  color: var(--inverse);
+  font-size: var(--fs-text);
+  font-weight: 700;
+  transition: box-shadow var(--t-base) var(--ease-out), background-color var(--t-base) var(--ease-out);
+}
+
+.fab:hover { box-shadow: 0 18px 38px color-mix(in srgb, var(--c) 50%, transparent); }
+.fab:focus-visible { outline: none; box-shadow: var(--focus-ring), 0 14px 30px color-mix(in srgb, var(--c) 40%, transparent); }
+
+.fabIcon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.18);
+}
+
+.fabIcon > span { display: grid; place-items: center; }
+
+.fabLabel {
+  max-width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (min-width: 1920px) {
+  .dial { right: 44px; bottom: 40px; }
+}
+
+
+/* Sobre el dock inferior en tablet vertical y móvil */
+@media (max-width: 768px) {
+  .dial { right: 16px; bottom: calc(96px + env(safe-area-inset-bottom)); }
+  .list { max-height: calc(100dvh - 230px); }
+}
+
+@media (max-width: 500px) {
+  .fab { min-height: 54px; padding-right: 20px; }
+  .fabIcon { width: 38px; height: 38px; }
+  .fabLabel { max-width: 140px; }
+}
+
+@media (max-width: 390px) {
+  .fabLabel { display: none; }
+  .fab { padding-right: 8px; }
+}
+
+@media (max-height: 560px) and (max-width: 1100px) {
+  .dial { bottom: 16px; }
+}
+

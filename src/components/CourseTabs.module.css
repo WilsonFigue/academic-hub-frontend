@@ -1,0 +1,82 @@
+/* Pestañitas de materia, pegadas al borde superior de la tarjeta del ciclo. */
+
+.tabs {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  margin-bottom: -1px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar { display: none; }
+
+.tab {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  max-width: 230px;
+  padding: 0 18px 0 14px;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: 16px 16px 0 0;
+  background: var(--panel-row);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+  transition: background-color var(--t-base) var(--ease-out), color var(--t-base) var(--ease-out), transform var(--t-base) var(--ease-out), min-height var(--t-base) var(--ease-out);
+}
+
+.tab:hover { background: var(--surface); color: var(--text); transform: translateY(-3px); }
+.tab:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+/* La pestaña elegida se funde con la tarjeta */
+.tabOn {
+  z-index: 3;
+  min-height: 46px;
+  border-color: var(--border);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 2px 0 0 var(--surface);
+}
+
+.tabOn:hover { transform: none; }
+
+.bar {
+  position: absolute;
+  top: -1px;
+  left: 12px;
+  right: 12px;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  background: var(--c);
+}
+
+.icon { flex: none; color: var(--c); transition: transform 360ms var(--ease-out); }
+.tab:hover .icon { transform: rotate(-10deg) scale(1.15); }
+.name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+@media (min-width: 1920px) {
+  .tab { min-height: 46px; font-size: 14px; padding: 0 22px 0 16px; }
+  .tabOn { min-height: 52px; }
+}
+
+@media (max-width: 1100px) {
+  .tab { max-width: 190px; }
+}
+
+@media (max-width: 581px) {
+  .tabs { margin-inline: calc(var(--canvas-pad) * -1); padding-inline: var(--canvas-pad); }
+  .tab { min-height: 38px; padding: 0 14px 0 11px; max-width: 160px; }
+  .tabOn { min-height: 42px; }
+}
+
+@media (max-width: 390px) {
+  .tab { max-width: 130px; }
+}
+

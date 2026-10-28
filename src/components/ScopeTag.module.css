@@ -1,0 +1,28 @@
+.slot { position: relative; display: inline-flex; min-width: 0; max-width: 100%; }
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  max-width: 100%;
+  min-height: 26px;
+  padding: 0 11px 0 4px;
+  border-radius: var(--radius-pill);
+  background: var(--cbg);
+  color: var(--c);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--c);
+  color: var(--inverse);
+}
+
+.name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

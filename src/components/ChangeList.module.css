@@ -1,0 +1,90 @@
+/* Novedades como línea de tiempo: un nodo con el color de la materia, sin iconos en cuadros. */
+
+.list {
+  position: relative;
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: start;
+  padding: 10px 0;
+}
+
+/* Hilo vertical que une los nodos */
+.item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 26px;
+  bottom: -10px;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--border);
+}
+
+.node {
+  position: relative;
+  width: 12px;
+  height: 12px;
+  margin-top: 5px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px var(--panel);
+}
+
+.body {
+  min-width: 0;
+}
+
+.title {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  margin-top: 2px;
+  font-size: var(--fs-meta);
+  color: var(--muted);
+}
+
+.meta span + span::before {
+  content: '·';
+  margin-right: 8px;
+}
+
+.detail {
+  margin-top: 6px;
+  font-size: var(--fs-body);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.action {
+  align-self: center;
+  min-height: 32px;
+  padding: 0 14px;
+  border: 1px solid var(--control);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text);
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  line-height: 30px;
+  text-decoration: none;
+  transition: border-color var(--t-fast) var(--ease-out);
+}
+
+.action:hover {
+  border-color: var(--text);
+  color: var(--text);
+}

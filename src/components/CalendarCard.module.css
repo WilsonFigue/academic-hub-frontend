@@ -1,0 +1,452 @@
+/* Calendario del Inicio: mini-mes + hojas de día. Los bloques de actividad se adaptan al ancho de su propia hoja
+   (container queries) y a la pantalla (breakpoints del proyecto). */
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin-bottom: 22px;
+}
+
+.title {
+  font-size: var(--fs-section);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.titleRow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; min-width: 0; }
+
+.sub {
+  margin-top: 4px;
+  font-size: var(--fs-body);
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.pager { display: flex; align-items: center; gap: 8px; }
+
+.navBtn {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  transition: all var(--t-fast) var(--ease-out);
+}
+
+.navBtn:hover:not(:disabled) { border-color: var(--text); background: var(--text); color: var(--inverse); transform: translateY(-1px); }
+.navBtn:active:not(:disabled) { transform: scale(0.94); }
+.navBtn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.todayBtn {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--inverse);
+  font-size: var(--fs-body);
+  font-weight: 700;
+  animation: pop 320ms var(--ease-out) both;
+}
+
+@keyframes pop { from { opacity: 0; transform: scale(0.85); } }
+@keyframes rise { from { opacity: 0; transform: translateY(8px) scale(0.9); } }
+
+.body {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+/* ── Mini-mes ── */
+.mini {
+  padding: 18px 16px 16px;
+  border-radius: 20px;
+  background: var(--panel-row);
+}
+
+.miniHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding: 0 4px;
+}
+
+.miniHead strong { font-size: var(--fs-body); font-weight: 800; }
+.miniBtns { display: flex; gap: 4px; }
+
+.miniNav {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  color: var(--text);
+  transition: transform var(--t-fast) var(--ease-out);
+}
+
+.miniNav:hover:not(:disabled) { transform: translateY(-1px); }
+.miniNav:disabled { opacity: 0.3; }
+
+.miniWeek {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 4px;
+  font-size: 10px;
+  font-weight: 800;
+  text-align: center;
+  color: var(--faint);
+}
+
+.miniGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  row-gap: 2px;
+}
+
+.miniDay {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 2px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 12.5px;
+  font-weight: 600;
+  animation: rise 420ms var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 14ms);
+}
+
+.miniDay span {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  transition: background-color var(--t-fast) var(--ease-out), transform var(--t-fast) var(--ease-out);
+}
+
+.miniDay:hover span { background: var(--surface); transform: scale(1.12); box-shadow: var(--shadow-card); }
+.miniDay:active span { transform: scale(0.94); }
+.miniOut { opacity: 0.4; }
+.miniWin { background: var(--accent-soft); }
+.miniWinStart { border-radius: 14px 0 0 14px; }
+.miniWinEnd { border-radius: 0 14px 14px 0; }
+.miniWinStart.miniWinEnd { border-radius: 14px; }
+.miniToday span { background: var(--accent); color: var(--inverse); font-weight: 800; box-shadow: 0 4px 10px rgb(255 90 54 / 0.35); }
+.miniToday:hover span { background: var(--accent); }
+
+.miniDots { display: flex; justify-content: center; gap: 2px; height: 5px; }
+.miniDots b { width: 5px; height: 5px; border-radius: 50%; }
+
+/* ── Hojas de día ── */
+.pages {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 5), minmax(0, 1fr));
+  gap: 12px;
+}
+
+.page {
+  container-type: inline-size;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  min-height: 300px;
+  overflow: hidden;
+  border: 1.5px solid transparent;
+  border-radius: 18px;
+  background: var(--panel-row);
+  transition: box-shadow var(--t-base) var(--ease-out);
+}
+
+.page:hover { box-shadow: var(--shadow-lift); }
+.pageToday { border-color: var(--accent); background: var(--accent-soft); }
+.pagePast { opacity: 0.62; }
+.pagePast:hover { opacity: 1; }
+
+.pageTop {
+  --band: var(--text);
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 12px 14px 11px;
+  background: var(--band);
+  color: var(--inverse);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Argollas de la hoja */
+.pageTop::before,
+.pageTop::after {
+  content: '';
+  position: absolute;
+  top: -6px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--surface);
+}
+
+.pageTop::before { left: 24%; }
+.pageTop::after { right: 24%; }
+
+.pageToday .pageTop { --band: var(--accent); }
+.pageWeekend .pageTop { --band: color-mix(in srgb, var(--text) 58%, #fff); }
+.pageTop small { margin-right: auto; font-size: 10px; opacity: 0.8; }
+
+.pageCount {
+  min-width: 20px;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  background: rgb(255 255 255 / 0.25);
+  font-size: 11px;
+  text-align: center;
+}
+
+.pageNum {
+  padding: 16px 0 10px;
+  font-size: 44px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  text-align: center;
+}
+
+.pageToday .pageNum { color: var(--accent-ink); }
+
+.pageItems {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  min-width: 0;
+  padding: 4px 12px 14px;
+}
+
+.pageFree {
+  display: grid;
+  place-items: center;
+  min-height: 92px;
+  border: 1.5px dashed var(--control);
+  border-radius: 14px;
+  font-size: 12px;
+  color: var(--faint);
+}
+
+/* Bloque de actividad: barra de color inscrita (no un borde pegado), hora en píldora, título y materia con aire */
+.chip {
+  position: relative;
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  padding: 13px 14px 13px 24px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--cbg, var(--pill-neutral-bg));
+  color: var(--text);
+  text-align: left;
+  transition: box-shadow var(--t-fast) var(--ease-out);
+}
+
+.chip::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 12px;
+  bottom: 12px;
+  width: 4px;
+  border-radius: 4px;
+  background: var(--c, var(--pill-neutral-ink));
+}
+
+button.chip:hover { box-shadow: var(--shadow-card); }
+
+.chipTime {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: fit-content;
+  max-width: 100%;
+  white-space: nowrap;
+  padding: 2px 9px 2px 7px;
+  border-radius: var(--radius-pill);
+  background: rgb(255 255 255 / 0.7);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.chipTitle {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 1.32;
+  overflow-wrap: anywhere;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+}
+
+.chipCourse {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.chipCourse svg { flex: none; color: var(--c, var(--muted)); }
+
+.chipCourse em {
+  min-width: 0;
+  overflow: hidden;
+  font-style: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pageMore {
+  justify-self: center;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-ink);
+  text-decoration: none;
+  transition: background-color var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out);
+}
+
+.pageMore:hover { background: var(--accent); color: var(--inverse); }
+
+.footLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 18px;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--accent-ink);
+  text-decoration: none;
+}
+
+.footLink:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+/* ── Según el ancho de cada hoja ── */
+@container (max-width: 150px) {
+  .pageTop { padding-inline: 10px; }
+  .pageTop small { display: none; }
+  .pageNum { font-size: 38px; }
+  .pageItems { padding-inline: 9px; }
+  .chip { gap: 6px; padding: 11px 10px 11px 20px; }
+  .chip::before { left: 8px; width: 3px; }
+  .chipTime { padding: 2px 8px; font-size: 10.5px; }
+  .chipTime svg { display: none; }
+  .chipTitle { font-size: 12.5px; }
+  .chipCourse em { display: none; }
+}
+
+@container (min-width: 210px) {
+  .pageItems { padding-inline: 14px; }
+  .chip { padding: 15px 16px 15px 26px; gap: 8px; }
+  .chip::before { left: 11px; top: 14px; bottom: 14px; }
+  .chipTitle { font-size: 14.5px; }
+  .chipCourse { font-size: 12px; }
+}
+
+@container (min-width: 270px) {
+  .pageNum { font-size: 52px; }
+  .chipTitle { font-size: 15.5px; }
+}
+
+/* ── Puntos de quiebre (ancho) ── */
+@media (min-width: 1920px) {
+  .body { grid-template-columns: 320px minmax(0, 1fr); gap: 34px; }
+  .page { min-height: 340px; }
+  .miniDay { height: 44px; }
+  .pageTop { font-size: 12px; }
+}
+
+@media (max-width: 1574px) {
+  .page { min-height: 290px; }
+}
+
+@media (max-width: 1439px) {
+  .body { grid-template-columns: 264px minmax(0, 1fr); gap: 24px; }
+  .pages { gap: 11px; }
+}
+
+@media (max-width: 1365px) {
+  .body { grid-template-columns: 248px minmax(0, 1fr); gap: 20px; }
+  .pages { gap: 10px; }
+  .page { min-height: 280px; }
+}
+
+/* A partir de aquí el mini-mes se oculta: las hojas ocupan todo el ancho */
+@media (max-width: 1100px) {
+  .body { grid-template-columns: minmax(0, 1fr); }
+  .mini { display: none; }
+  .page { min-height: 270px; }
+}
+
+@media (max-width: 900px) {
+  .pages { gap: 10px; }
+  .pageItems { gap: 9px; }
+}
+
+@media (max-width: 768px) {
+  .page { min-height: 250px; }
+  .pageNum { font-size: 40px; }
+}
+
+@media (max-width: 581px) {
+  .pages { gap: 8px; }
+  .page { min-height: 230px; }
+  .pageNum { padding-top: 12px; font-size: 36px; }
+  .pageItems { padding-inline: 9px; }
+}
+
+@media (max-width: 500px) {
+  .navBtn { width: 38px; height: 38px; }
+  .todayBtn { min-height: 38px; }
+  .chip { padding-block: 12px; }
+}
+
+@media (max-width: 390px) {
+  .pages { gap: 6px; }
+  .pageTop::before { left: 18%; }
+  .pageTop::after { right: 18%; }
+}
+
+/* ── Puntos de quiebre (alto) ── */
+@media (max-height: 860px) and (min-width: 1101px) {
+  .page { min-height: 260px; }
+  .pageNum { padding-block: 12px 8px; font-size: 40px; }
+}
+
+@media (max-height: 560px) and (max-width: 1100px) {
+  .page { min-height: 190px; }
+  .pageNum { font-size: 32px; padding-block: 8px 6px; }
+}
+

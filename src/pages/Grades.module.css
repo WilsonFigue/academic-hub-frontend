@@ -1,0 +1,199 @@
+.stack {
+  display: grid;
+  gap: var(--gap);
+}
+
+.head {
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: var(--fs-title);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.lede {
+  margin-top: 6px;
+  max-width: 64ch;
+  color: var(--muted);
+}
+
+/* ── Selector de materia ── */
+.courseTabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: var(--gap);
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+
+.courseTab {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 12px;
+  min-width: 220px;
+  padding: 12px 16px 12px 12px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface);
+  color: var(--text);
+  text-align: left;
+  transition: transform var(--t-base) var(--ease-out), box-shadow var(--t-base) var(--ease-out), border-color var(--t-base) var(--ease-out);
+}
+
+.courseTab:hover { transform: translateY(-2px); box-shadow: var(--shadow-card); }
+.courseTab[aria-selected='true'] { border-color: var(--c); color: var(--inverse); box-shadow: var(--shadow-lift); }
+
+.courseTabBg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--c), color-mix(in srgb, var(--c) 70%, #000));
+}
+
+.courseTabIcon,
+.courseTabText { position: relative; z-index: 1; }
+
+.courseTabIcon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--cbg);
+  color: var(--c);
+}
+
+.courseTab[aria-selected='true'] .courseTabIcon { background: rgb(255 255 255 / 0.2); color: var(--inverse); }
+
+.courseTabText {
+  display: grid;
+  min-width: 0;
+  font-size: var(--fs-body);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.courseTabText small { font-size: 11px; font-weight: 500; opacity: 0.8; }
+
+/* ── Cabecera de la materia ── */
+.hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  border-radius: 22px;
+  background: linear-gradient(120deg, var(--cbg), #fff 80%);
+  border: 1px solid var(--border);
+}
+
+.heroIcon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  background: var(--c);
+  color: var(--inverse);
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--c) 40%, transparent);
+}
+
+.heroText { flex: 1; min-width: 200px; }
+.heroText h2 { font-size: var(--fs-section); font-weight: 700; }
+.heroText p { font-size: var(--fs-body); color: var(--muted); }
+.heroText em { font-style: normal; color: var(--faint); }
+
+.heroBest {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--pill-warning-bg);
+  color: var(--pill-warning-ink);
+  font-size: var(--fs-meta);
+  font-weight: 700;
+}
+
+.charts {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: var(--gap);
+  align-items: start;
+}
+
+.chartCard { min-width: 0; }
+
+.chartTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: var(--fs-body);
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.note {
+  padding: 24px 0;
+  font-size: var(--fs-body);
+  color: var(--faint);
+  text-align: center;
+}
+
+.pending {
+  display: grid;
+  gap: 18px;
+  padding: 18px 20px;
+  border-radius: 20px;
+  background: var(--panel-row);
+}
+
+.pendingTitle {
+  margin-bottom: 8px;
+  font-size: var(--fs-body);
+  font-weight: 700;
+}
+
+.pendingTitle span { margin-left: 6px; color: var(--faint); }
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  transition: all var(--t-fast) var(--ease-out);
+}
+
+.chip:hover { border-color: var(--accent); color: var(--accent-ink); transform: translateY(-1px); }
+.chip small { color: var(--faint); }
+.chipCalc strong { color: var(--accent-ink); }
+
+@media (max-width: 1100px) {
+  .charts { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 581px) {
+  .courseTab { min-width: 180px; }
+  .hero { padding: 16px; }
+  .courseTabs { margin-inline: calc(var(--canvas-pad) * -1); padding-inline: var(--canvas-pad); }
+}

@@ -1,0 +1,220 @@
+.chart {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Ocupa el alto sobrante de su tarjeta (la tarjeta es una columna flex) */
+.chartFill {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  min-height: calc(240px * var(--chart-scale, 1));
+}
+
+.chart :global(.recharts-surface) {
+  overflow: visible;
+}
+
+.chart :global(.recharts-bar-rectangle:focus),
+.chart :global(.recharts-sector:focus) {
+  outline: none;
+}
+
+/* ── Pastel ── */
+/* Contenedor consultable: el pastel y su leyenda se apilan en tarjetas angostas y van lado a lado en las anchas */
+.donutBox {
+  container-type: inline-size;
+}
+
+.donutWrap {
+  display: grid;
+  gap: 22px;
+  align-items: center;
+  justify-items: center;
+}
+
+.donutWrap .legend {
+  width: 100%;
+}
+
+@container (min-width: 440px) {
+  .donutWrap {
+    grid-template-columns: auto minmax(220px, 1fr);
+    gap: 32px;
+    justify-items: stretch;
+  }
+
+  .donutWrap .donut {
+    width: 200px;
+  }
+}
+
+.donut {
+  position: relative;
+  width: min(100%, calc(230px * var(--chart-scale, 1)));
+  aspect-ratio: 1;
+  margin-inline: auto;
+  filter: drop-shadow(0 10px 18px rgb(20 26 36 / 0.1));
+}
+
+.donutSvg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.donutCenter {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 4px;
+  padding: 0 24%;
+  text-align: center;
+  pointer-events: none;
+}
+
+.donutCenter strong {
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.donutCenter span {
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--muted);
+}
+
+/* Leyenda: cada fila es un botón (filtra por ese estado) con icono en disco de color */
+.legend {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.legendRow {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  grid-template-areas: 'icon name count pct' 'bar bar bar bar';
+  align-items: center;
+  gap: 4px 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1.5px solid transparent;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--text);
+  font-size: var(--fs-body);
+  text-align: left;
+  transition: background-color var(--t-fast) var(--ease-out), border-color var(--t-fast) var(--ease-out), transform var(--t-fast) var(--ease-out);
+}
+
+.legendRow:disabled { cursor: default; }
+.legendRow:not(:disabled):hover { transform: translateX(3px); }
+
+.legendActive {
+  background: var(--panel-row);
+}
+
+.legendSelected {
+  border-color: var(--c);
+  background: color-mix(in srgb, var(--c) 9%, var(--surface));
+}
+
+.legendIcon {
+  grid-area: icon;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--c);
+  color: var(--inverse);
+  box-shadow: 0 4px 10px color-mix(in srgb, var(--c) 35%, transparent);
+}
+
+.legendName {
+  grid-area: name;
+  min-width: 0;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.legendRow strong {
+  grid-area: count;
+  font-size: var(--fs-text);
+  font-weight: 800;
+}
+
+.legendPct {
+  grid-area: pct;
+  min-width: 36px;
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  text-align: right;
+  color: var(--muted);
+}
+
+.legendBar {
+  grid-area: bar;
+  display: block;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--panel-row);
+  overflow: hidden;
+}
+
+.legendBar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--c);
+  transition: width 600ms var(--ease-out);
+}
+
+/* ── Tooltip de notas ── */
+.tip {
+  display: grid;
+  gap: 3px;
+  max-width: 280px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow-lift);
+  font-size: var(--fs-meta);
+  color: var(--muted);
+}
+
+.tip strong {
+  font-size: var(--fs-body);
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.tipCourse {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tipCourse i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.tipScore {
+  font-weight: 800;
+}
+
+@media (max-width: 581px) {
+  .donutWrap { gap: 14px; }
+  .donutCenter strong { font-size: 30px; }
+}

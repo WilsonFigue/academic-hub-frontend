@@ -1,0 +1,196 @@
+/*
+  Academic Hub — tokens de diseño (v2, estilo "editorial greeting" de tasteskill, con la marca conservada).
+  Reglas: el color va en los datos, no en el cromo. Paneles tonales sin sombra. El violeta de la marca
+  marca solo el dato principal (hoy, la próxima entrega, la materia seleccionada) y como mucho un control.
+
+  Breakpoints del proyecto (de mayor a menor) — los media queries usan estos valores exactos:
+    min-width 2560 · 4K          min-width 1920 · Full HD / 2K
+    max-width 1574 · compactar   max-width 1439 · tablas y dashboards
+    max-width 1365 · laptop 13"  max-width 1100 · tablet horizontal (el menú lateral se pliega)
+    max-width 900  · widgets     max-width 768  · tablet vertical (barra inferior)
+    max-width 581  · móvil       max-width 500  · widgets      max-width 390 · móvil pequeño
+  Por altura: max-height 860 (min-width 1101) escritorio corto · 800/700/620 asistentes (login)
+              max-height 560 (max-width 1100) tablet corta
+*/
+:root {
+  /* Superficies: papel cálido, paneles blancos definidos */
+  --ground: #f7f6f2;
+  --surface: #ffffff;
+  --panel: #ffffff;
+  --panel-row: #f4f2ec;
+  --active: #ffe9e3;
+  --hover: #f6f3ee;
+  --border: #e7e2d8;
+  --rule: #ece8df;
+  --control: #cdc6b8;
+
+  /* Texto: tinta azul marino */
+  --text: #141a24;
+  --muted: #556070;
+  --faint: #7b8494;
+  --inverse: #ffffff;
+
+  /* Marca: coral como acento, marino como tinta fuerte */
+  --accent: #ff5a36;
+  --accent-ink: #c2401f;
+  --accent-soft: #ffe9e3;
+  --primary: #141a24;
+  --primary-hover: #26303f;
+  --pink: #e11d74;
+  --coral: #ff5a36;
+  --mint: #0f9f6e;
+  --amber: #f0a020;
+  --sky: #2f7cf6;
+  --teal: #0ea5a0;
+
+  /* Semántica de estado (bien / regular / mal) */
+  --ok: #0f9f6e;
+  --warn: #f0a020;
+  --bad: #e5392f;
+  --st-pending: #d97706;      /* por entregar: ámbar, distinto del rojo de vencida */
+  --st-pending-ink: #b45309;
+
+  /* Bloques oscuros (marino) */
+  --hero-bg: #141a24;
+  --hero-bg-2: #1f2d44;
+  --hero-ink: #ffffff;
+  --hero-muted: rgb(255 255 255 / 0.7);
+  --hero-cell: rgb(255 255 255 / 0.1);
+
+  --shadow-card: 0 1px 2px rgb(20 26 36 / 0.05), 0 6px 18px rgb(20 26 36 / 0.06);
+  --shadow-lift: 0 14px 30px rgb(20 26 36 / 0.14);
+
+  --positive: #0f9f6e;  --pill-positive-bg: #d9f5e9;  --pill-positive-ink: #0b6b45;
+  --negative: #e5392f;  --pill-negative-bg: #ffe6e3;  --pill-negative-ink: #a1231c;
+  --warning: #c77700;   --pill-warning-bg: #fff1d6;   --pill-warning-ink: #8a4b00;
+  --info: #2f7cf6;      --pill-info-bg: #e3edff;      --pill-info-ink: #1a4fb0;
+  --pill-neutral-bg: #ecebe5; --pill-neutral-ink: #4a5260;
+  --pill-accent-bg: var(--accent-soft); --pill-accent-ink: var(--accent-ink);
+  --highlight: #fff3a3;
+
+  /* Tintes de identidad por materia */
+  --tint-1-bg: #ffe4d6; --tint-1-fg: #ea580c;
+  --tint-2-bg: #d8f3ea; --tint-2-fg: #0e9f6e;
+  --tint-3-bg: #dbeafe; --tint-3-fg: #2563eb;
+  --tint-4-bg: #fdf0c2; --tint-4-fg: #b7791f;
+  --tint-5-bg: #fde2ec; --tint-5-fg: #db2777;
+  --tint-6-bg: #d9f2f1; --tint-6-fg: #0d9488;
+
+  --focus-ring: 0 0 0 3px rgb(255 90 54 / 0.32);
+
+  /* Tipografía: una sola familia, escala corta (12/14/16/18/24/30) */
+  --font: 'Plus Jakarta Sans Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --fs-meta: 0.75rem;   /* 12 */
+  --fs-body: 0.875rem;  /* 14 */
+  --fs-text: 1rem;      /* 16 */
+  --fs-section: 1.125rem; /* 18 */
+  --fs-title: 1.5rem;   /* 24 */
+  --fs-greeting: 1.875rem; /* 30 */
+  --fs-figure: 1.75rem; /* 28 */
+
+  /* Espaciado (base 4) y radios: suave y escalonado (20 / 14 / 10 / 999) */
+  --gap: 16px;
+  --pad: 20px;
+  --section-gap: 40px;
+  --radius-panel: 20px;
+  --radius-row: 14px;
+  --radius-control: 10px;
+  --radius-pill: 999px;
+  --control-h: 40px;
+  --row-h: 64px;
+
+  /* Layout */
+  --sidebar: 248px;
+  --column: 1120px;          /* columna central (12 × 77 + 11 × 16 = 1100, más márgenes internos) */
+  --canvas-pad: 40px;
+  --canvas-top: 56px;
+
+  /* Movimiento */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in: cubic-bezier(0.55, 0, 1, 0.45);
+  --t-fast: 120ms;
+  --t-base: 200ms;
+  --t-slow: 320ms;
+
+  --z-bar: 20;
+  --z-overlay: 40;
+  --z-sheet: 50;
+}
+
+/* ── Breakpoints de ancho ─────────────────────────────────────────── */
+@media (min-width: 1920px) {
+  :root { --column: 1280px; --sidebar: 264px; --canvas-pad: 56px; --canvas-top: 64px; }
+}
+@media (min-width: 2560px) {
+  :root { --column: 1520px; --canvas-pad: 64px; --canvas-top: 72px; }
+}
+@media (max-width: 1574px) { :root { --column: 1080px; } }
+@media (max-width: 1439px) { :root { --canvas-pad: 32px; --section-gap: 36px; } }
+@media (max-width: 1365px) { :root { --sidebar: 224px; --canvas-pad: 28px; --pad: 18px; } }
+@media (max-width: 1100px) { :root { --canvas-pad: 28px; --canvas-top: 32px; } }
+@media (max-width: 768px)  { :root { --canvas-pad: 20px; --section-gap: 32px; --fs-greeting: 1.625rem; --radius-panel: 18px; } }
+@media (max-width: 581px)  { :root { --canvas-pad: 16px; --pad: 16px; --canvas-top: 20px; --fs-greeting: 1.5rem; --fs-title: 1.375rem; --fs-figure: 1.5rem; --row-h: 60px; } }
+@media (max-width: 390px)  { :root { --canvas-pad: 14px; --pad: 14px; --fs-greeting: 1.375rem; --fs-figure: 1.375rem; } }
+
+/* ── Breakpoints de altura ────────────────────────────────────────── */
+@media (max-height: 860px) and (min-width: 1101px) { :root { --canvas-top: 32px; --section-gap: 28px; --row-h: 58px; } }
+@media (max-height: 560px) and (max-width: 1100px) { :root { --canvas-top: 16px; --section-gap: 24px; } }
+
+/* Alias de los nombres v1 → tokens v2 (los módulos aún no reescritos los usan). */
+:root {
+  --color-bg: var(--ground);
+  --color-surface: var(--surface);
+  --color-surface-sunken: var(--panel);
+  --color-surface-hover: var(--hover);
+  --color-line: var(--border);
+  --color-line-strong: var(--control);
+  --color-ink: var(--text);
+  --color-ink-2: var(--muted);
+  --color-ink-3: var(--faint);
+  --color-ink-inverse: var(--inverse);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-ink);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-line: #d6ccf6;
+  --color-success: var(--positive);
+  --color-success-soft: var(--pill-positive-bg);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--pill-warning-bg);
+  --color-danger: var(--negative);
+  --color-danger-soft: var(--pill-negative-bg);
+  --color-info: var(--info);
+  --color-info-soft: var(--pill-info-bg);
+  --color-highlight: var(--highlight);
+  --font-sans: var(--font);
+  --text-xs: var(--fs-meta);
+  --text-sm: var(--fs-body);
+  --text-md: var(--fs-text);
+  --text-lg: var(--fs-section);
+  --text-xl: 1.25rem;
+  --text-2xl: var(--fs-title);
+  --text-3xl: var(--fs-greeting);
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 20px;
+  --space-6: 24px; --space-8: 32px; --space-10: 40px; --space-12: 48px; --space-16: 64px;
+  --radius-sm: 8px;
+  --radius-md: var(--radius-control);
+  --radius-lg: var(--radius-panel);
+  --radius-xl: 22px;
+  /* Sin sombras en reposo: solo lo que flota (paneles laterales, menús) usa --shadow-3. */
+  --shadow-1: var(--shadow-card);
+  --shadow-2: var(--shadow-card);
+  --shadow-3: 0 18px 48px rgb(23 20 43 / 0.16);
+  --duration-fast: var(--t-fast);
+  --duration-base: var(--t-base);
+  --duration-slow: var(--t-slow);
+  --sidebar-width: var(--sidebar);
+  --content-max: var(--column);
+  --z-header: var(--z-bar);
+  --z-drawer: var(--z-sheet);
+}

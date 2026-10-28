@@ -1,0 +1,174 @@
+/* Acceso v3: tarjeta centrada sobre un fondo vivo con manchas de color y fichas flotantes. */
+
+.page {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding: 32px 20px 56px;
+  background: var(--ground);
+  overflow: hidden;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.blob1,
+.blob2,
+.blob3 {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.55;
+  animation: drift 14s ease-in-out infinite alternate;
+}
+
+.blob1 { width: 520px; height: 520px; left: -140px; top: -160px; background: var(--accent); }
+.blob2 { width: 460px; height: 460px; right: -120px; top: 10%; background: var(--pink); animation-delay: -5s; }
+.blob3 { width: 420px; height: 420px; left: 30%; bottom: -200px; background: var(--sky); animation-delay: -9s; }
+
+@keyframes drift { to { transform: translate3d(40px, 30px, 0) scale(1.1); } }
+
+.floater {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid rgb(255 255 255 / 0.7);
+  border-radius: 14px;
+  background: rgb(255 255 255 / 0.75);
+  backdrop-filter: blur(8px);
+  color: var(--accent-ink);
+  font-size: var(--fs-body);
+  font-weight: 700;
+  box-shadow: var(--shadow-card);
+}
+
+.card {
+  position: relative;
+  width: min(440px, 100%);
+  padding: 36px 36px 32px;
+  border: 1px solid rgb(255 255 255 / 0.8);
+  border-radius: 28px;
+  background: rgb(255 255 255 / 0.9);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 24px 60px rgb(20 26 36 / 0.18);
+}
+
+.brand {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.tagline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 28px;
+  font-size: var(--fs-meta);
+  font-weight: 700;
+  color: var(--pink);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.title {
+  font-size: var(--fs-title);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+.subtitle {
+  margin-top: 6px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.form {
+  display: grid;
+  gap: 18px;
+  margin-top: 28px;
+}
+
+.alert {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: var(--pill-negative-bg);
+  color: var(--pill-negative-ink);
+  font-size: var(--fs-body);
+}
+
+.alert svg { flex: none; width: 20px; height: 20px; }
+
+.alertInfo {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+.footnote {
+  margin-top: 22px;
+  font-size: var(--fs-meta);
+  color: var(--muted);
+  text-align: center;
+}
+
+.success {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: var(--pill-positive-bg);
+  color: var(--pill-positive-ink);
+}
+
+.foot {
+  position: absolute;
+  bottom: 18px;
+  left: 0;
+  right: 0;
+  font-size: var(--fs-meta);
+  color: var(--faint);
+  text-align: center;
+}
+
+/* Alturas cortas del asistente */
+@media (max-height: 800px) {
+  .card { padding: 28px 30px 26px; }
+  .tagline { margin-bottom: 20px; }
+  .form { gap: 14px; margin-top: 22px; }
+}
+
+@media (max-height: 700px) {
+  .floater { display: none; }
+  .tagline { display: none; }
+  .form { margin-top: 18px; }
+  .footnote { margin-top: 14px; }
+}
+
+@media (max-height: 620px) {
+  .page { place-items: start center; padding-top: 16px; }
+  .card { padding: 20px 22px 18px; }
+  .form { gap: 10px; margin-top: 14px; }
+  .foot { display: none; }
+}
+
+@media (max-width: 581px) {
+  .floater { display: none; }
+  .card { padding: 28px 22px 24px; border-radius: 22px; }
+}
+
+@media (max-height: 560px) and (max-width: 1100px) {
+  .brand { margin-bottom: 4px; }
+}

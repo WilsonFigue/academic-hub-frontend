@@ -1,0 +1,292 @@
+/* Encabezado de página y controles de filtro (v2). Una sola altura de control: --control-h. */
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px 24px;
+  margin-bottom: 28px;
+}
+
+.title {
+  font-size: var(--fs-title);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.lede {
+  margin-top: 6px;
+  max-width: 64ch;
+  font-size: var(--fs-text);
+  color: var(--muted);
+}
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+/* ── Búsqueda ── */
+.search {
+  position: relative;
+  flex: 1 1 260px;
+  min-width: 0;
+  max-width: 420px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  transform: translateY(-50%);
+  color: var(--faint);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  min-height: var(--control-h);
+  padding: 0 40px 0 42px;
+  border: 1px solid var(--control);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  font-size: var(--fs-body);
+  transition: border-color var(--t-fast) var(--ease-out), box-shadow var(--t-fast) var(--ease-out);
+}
+
+.searchInput::placeholder {
+  color: var(--faint);
+}
+
+.searchInput:hover {
+  border-color: var(--faint);
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--focus-ring);
+}
+
+.searchInput::-webkit-search-cancel-button {
+  display: none;
+}
+
+.clear {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  transform: translateY(-50%);
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--faint);
+}
+
+.clear:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.clear svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ── Selector ── */
+.select {
+  position: relative;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.selectControl {
+  max-width: 240px;
+  min-height: var(--control-h);
+  padding: 0 36px 0 16px;
+  border: 1px solid var(--control);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  font-size: var(--fs-body);
+  font-weight: 500;
+  appearance: none;
+  cursor: pointer;
+  text-overflow: ellipsis;
+  transition: border-color var(--t-fast) var(--ease-out), background-color var(--t-fast) var(--ease-out);
+}
+
+.selectControl:hover {
+  border-color: var(--faint);
+}
+
+.selectControl:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--focus-ring);
+}
+
+/* Un filtro aplicado se ve: tinta llena, no color de marca */
+.selectActive .selectControl {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--inverse);
+}
+
+.selectActive .chevron {
+  color: var(--inverse);
+}
+
+.chevron {
+  position: absolute;
+  right: 13px;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  transform: translateY(-50%);
+  color: var(--faint);
+  pointer-events: none;
+}
+
+/* ── Opciones segmentadas: pista tonal y una píldora blanca que se desliza ── */
+.segmented {
+  display: inline-flex;
+  gap: 2px;
+  max-width: 100%;
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--pill-neutral-bg);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.segmented::-webkit-scrollbar {
+  display: none;
+}
+
+.segment {
+  position: relative;
+  flex: none;
+  min-height: 34px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--muted);
+  font-size: var(--fs-body);
+  font-weight: 600;
+  white-space: nowrap;
+  transition: color var(--t-fast) var(--ease-out);
+}
+
+.segment:hover {
+  color: var(--text);
+}
+
+.segment[aria-pressed='true'],
+.segment[aria-selected='true'] {
+  color: var(--inverse);
+}
+
+.segmentPill {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  box-shadow: 0 4px 12px rgb(255 90 54 / 0.3);
+}
+
+.segmentLabel {
+  position: relative;
+  z-index: 1;
+}
+
+.count {
+  margin-left: 6px;
+  color: var(--faint);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  margin: 0 0 14px;
+  font-size: var(--fs-body);
+  color: var(--muted);
+}
+
+.reset {
+  min-height: 32px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--accent-ink);
+  font-size: var(--fs-body);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.reset:hover {
+  background: var(--hover);
+}
+
+.mark {
+  padding: 0 2px;
+  border-radius: 3px;
+  background: var(--highlight);
+  color: inherit;
+}
+
+@media (max-width: 581px) {
+  .header {
+    margin-bottom: 20px;
+  }
+
+  .search {
+    flex-basis: 100%;
+    max-width: none;
+  }
+
+  /* Filtros en una fila que se desplaza; la página nunca */
+  .bar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-inline: calc(var(--canvas-pad) * -1);
+    padding-inline: var(--canvas-pad);
+  }
+
+  .bar:has(.search) {
+    flex-wrap: wrap;
+    overflow: visible;
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+
+  .segmented {
+    margin-inline: calc(var(--canvas-pad) * -1);
+    padding-inline: var(--canvas-pad);
+    border-radius: 0;
+    background: transparent;
+    max-width: calc(100% + var(--canvas-pad) * 2);
+  }
+
+  .segmentPill {
+    background: var(--accent);
+  }
+}

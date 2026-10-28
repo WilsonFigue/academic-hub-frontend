@@ -1,0 +1,101 @@
+@import '@fontsource-variable/plus-jakarta-sans';
+@import './tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  background: var(--ground);
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--ground);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, p {
+  margin: 0;
+}
+
+h1, h2, h3 {
+  line-height: 1.2;
+  letter-spacing: -0.012em;
+  text-wrap: balance;
+}
+
+a {
+  color: var(--accent-ink);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: 8px;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+/* Cifras tabulares en todo número que se compara o se actualiza */
+.num,
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: 16px;
+  top: -48px;
+  z-index: 100;
+  padding: 8px 16px;
+  background: var(--primary);
+  color: var(--inverse);
+  border-radius: 10px;
+  transition: top var(--t-fast) var(--ease-out);
+}
+
+.skip-link:focus {
+  top: 16px;
+}

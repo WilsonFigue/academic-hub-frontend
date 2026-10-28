@@ -1,0 +1,323 @@
+/* Primitivas v2: botones planos, paneles tonales sin sombra, pastillas en pares pálidos. */
+
+/* ── Botón ── */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--control-h);
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-body);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color var(--t-fast) var(--ease-out), border-color var(--t-fast) var(--ease-out),
+    color var(--t-fast) var(--ease-out), transform var(--t-fast) var(--ease-out);
+}
+
+.button:hover {
+  text-decoration: none;
+}
+
+.button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.primary {
+  background: var(--primary);
+  color: var(--inverse);
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+  box-shadow: var(--shadow-lift);
+  transform: translateY(-1px);
+}
+
+.secondary {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--control);
+}
+
+.secondary:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.ghost {
+  background: transparent;
+  color: var(--muted);
+}
+
+.ghost:hover:not(:disabled) {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.block {
+  width: 100%;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 700ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Campo ── */
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.label {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.inputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1px solid var(--control);
+  border-radius: 12px;
+  background: var(--surface);
+  font-size: var(--fs-text);
+  transition: border-color var(--t-fast) var(--ease-out), box-shadow var(--t-fast) var(--ease-out);
+}
+
+.input::placeholder {
+  color: var(--faint);
+}
+
+.input:hover {
+  border-color: var(--faint);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--focus-ring);
+}
+
+.input[aria-invalid='true'] {
+  border-color: var(--negative);
+}
+
+.withAction {
+  padding-right: 52px;
+}
+
+.inputAction {
+  position: absolute;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 40px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--faint);
+}
+
+.inputAction:hover {
+  color: var(--text);
+  background: var(--hover);
+}
+
+.inputAction svg {
+  width: 20px;
+  height: 20px;
+}
+
+.hint {
+  font-size: var(--fs-body);
+  color: var(--muted);
+}
+
+.fieldError {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  font-size: var(--fs-body);
+  color: var(--negative);
+}
+
+.fieldError svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+}
+
+/* ── Pastilla de estado ── */
+.badge {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  min-height: 22px;
+  padding: 0 9px;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.tone-neutral { background: var(--pill-neutral-bg); color: var(--pill-neutral-ink); }
+.tone-accent { background: var(--pill-accent-bg); color: var(--pill-accent-ink); }
+.tone-success { background: var(--pill-positive-bg); color: var(--pill-positive-ink); }
+.tone-warning { background: var(--pill-warning-bg); color: var(--pill-warning-ink); }
+.tone-danger { background: var(--pill-negative-bg); color: var(--pill-negative-ink); }
+.tone-info { background: var(--pill-info-bg); color: var(--pill-info-ink); }
+
+/* ── Panel tonal: un paso del suelo, sin borde ni sombra ── */
+.card {
+  min-width: 0;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-card);
+}
+
+.cardPadded {
+  padding: var(--pad);
+}
+
+.sectionHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin-bottom: 14px;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--fs-text);
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+
+.count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: var(--fs-meta);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.sectionLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--accent-ink);
+}
+
+.sectionLink:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/* ── Carga: barras planas a su tamaño real (sin brillo animado) ── */
+.skeleton {
+  display: block;
+  border-radius: 8px;
+  background: var(--pill-neutral-bg);
+  animation: breathe 1.6s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  50% { opacity: 0.55; }
+}
+
+/* ── Vacío / error: el marco se queda y una frase lo explica ── */
+.empty {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+  padding: 20px;
+  border: 1px dashed var(--control);
+  border-radius: var(--radius-row);
+}
+
+.emptyIcon {
+  display: block;
+  color: var(--faint);
+}
+
+.emptyIcon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.emptyIconDanger {
+  color: var(--negative);
+}
+
+.emptyTitle {
+  font-size: var(--fs-body);
+  font-weight: 600;
+}
+
+.emptyText {
+  max-width: 56ch;
+  font-size: var(--fs-body);
+  color: var(--muted);
+}
+
+.emptyAction {
+  margin-top: 8px;
+}
