@@ -1,15 +1,15 @@
 import * as Tooltip from '@radix-ui/react-tooltip';
 import {
-  BellRing, BookOpen, CalendarDays, ClipboardList, GraduationCap, House, LogOut, Menu, RefreshCw, Search, UserRound, X, type LucideIcon,
+  BellRing, BookOpen, CalendarDays, ClipboardList, GraduationCap, House, LogOut, Menu, UserRound, X, type LucideIcon,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useReducedMotion } from '../lib/motion';
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useDashboard, useLogout, useMe, useSession, useTerms } from '../api/hooks';
-import { formatLongDay, formatRelative } from '../lib/format';
 import { syncStatus } from '../lib/status';
 import { CommandPalette } from './CommandPalette';
+import { TopBar } from './TopBar';
 import { LogoMark } from './Logo';
 import styles from './AppShell.module.css';
 
@@ -104,28 +104,8 @@ export function AppShell({ children }: { children: ReactNode }) {
         </nav>
 
         {/* Barra superior */}
-        <header className={styles.topbar}>
-          <Link to="/dashboard" className={styles.topLogo}><LogoMark size={32} /><span>Academic Hub</span></Link>
-          <div className={styles.topDate}>
-            <strong>{formatLongDay(new Date())}</strong>
-            {term && <span>{term.name}{account ? ` · ${account.institutionCode}` : ''}</span>}
-          </div>
-          <button type="button" className={styles.searchButton} onClick={() => setPalette(true)}>
-            <Search size={18} aria-hidden="true" /><span>Buscar materias, actividades…</span><kbd>Ctrl K</kbd>
-          </button>
-          <div className={styles.topRight}>
-            <span className={`${styles.syncChip} ${styles[`sync-${sync.tone}`]}`} title={sync.label}>
-              <RefreshCw size={14} aria-hidden="true" />{lastImport ? `Datos ${formatRelative(lastImport)}` : sync.label}
-            </span>
-            <Link to="/updates" className={styles.iconButton} aria-label="Novedades">
-              <BellRing size={20} aria-hidden="true" />
-              {dashboard.data && dashboard.data.recentChanges.length > 0 && <span className={styles.dot} aria-hidden="true" />}
-            </Link>
-            <button type="button" className={`${styles.iconButton} ${styles.menuButton}`} onClick={() => setSheet(true)} aria-label="Abrir menú" aria-expanded={sheet}>
-              <Menu size={22} aria-hidden="true" />
-            </button>
-          </div>
-        </header>
+        <TopBar term={term} institution={account?.institutionCode} lastImport={lastImport} syncLabel={sync.label} syncTone={sync.tone}
+          news={dashboard.data?.recentChanges.length ?? 0} onSearch={() => setPalette(true)} onMenu={() => setSheet(true)} menuOpen={sheet} />
 
         {/* Hoja de navegación (≤1100) */}
         <AnimatePresence>

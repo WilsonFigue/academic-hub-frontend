@@ -143,110 +143,7 @@
 @keyframes tipIn { from { opacity: 0; transform: translateX(-4px); } }
 
 /* ── Barra superior ── */
-.topbar {
-  position: sticky;
-  top: 0;
-  z-index: var(--z-bar);
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  height: var(--top);
-  margin-left: var(--rail);
-  padding: 0 var(--canvas-pad);
-  background: rgb(247 246 242 / 0.86);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border);
-}
 
-.topLogo {
-  display: none;
-  align-items: center;
-  gap: 10px;
-  font-weight: 700;
-  color: var(--text);
-  text-decoration: none;
-}
-
-.topDate {
-  display: grid;
-  line-height: 1.2;
-  min-width: 0;
-}
-
-.topDate strong {
-  font-size: var(--fs-text);
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.topDate span {
-  font-size: var(--fs-meta);
-  color: var(--muted);
-  white-space: nowrap;
-}
-
-.searchButton {
-  display: flex;
-  flex: 1 1 320px;
-  align-items: center;
-  gap: 10px;
-  max-width: 520px;
-  min-height: 42px;
-  margin: 0 auto;
-  padding: 0 14px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
-  background: var(--surface);
-  color: var(--faint);
-  font-size: var(--fs-body);
-  text-align: left;
-  transition: border-color var(--t-fast) var(--ease-out), box-shadow var(--t-fast) var(--ease-out);
-}
-
-.searchButton:hover {
-  border-color: var(--accent);
-  box-shadow: var(--shadow-card);
-}
-
-.searchButton span {
-  flex: 1;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.searchButton kbd {
-  padding: 2px 7px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font: 600 11px var(--font);
-  color: var(--faint);
-}
-
-.topRight {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-left: auto;
-}
-
-.syncChip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 32px;
-  padding: 0 12px;
-  border-radius: var(--radius-pill);
-  font-size: var(--fs-meta);
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.sync-success { background: var(--pill-positive-bg); color: var(--pill-positive-ink); }
-.sync-warning { background: var(--pill-warning-bg); color: var(--pill-warning-ink); }
-.sync-danger { background: var(--pill-negative-bg); color: var(--pill-negative-ink); }
-.sync-info { background: var(--pill-info-bg); color: var(--pill-info-ink); }
-.sync-neutral { background: var(--pill-neutral-bg); color: var(--pill-neutral-ink); }
 
 .iconButton {
   position: relative;
@@ -264,21 +161,6 @@
 .iconButton:hover {
   background: var(--accent-soft);
   color: var(--accent-ink);
-}
-
-.dot {
-  position: absolute;
-  top: 9px;
-  right: 9px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--pink);
-  box-shadow: 0 0 0 2px var(--ground);
-}
-
-.menuButton {
-  display: none;
 }
 
 /* ── Hoja (≤1100) ── */
@@ -455,33 +337,22 @@
   .shell { --rail: 0px; }
 
   .rail { display: none; }
-  .topLogo { display: flex; }
-  .topDate { display: none; }
-  .menuButton { display: grid; }
-  .topbar { margin-left: 0; }
   .main { margin-left: 0; padding-top: 20px; }
 }
 
 @media (max-width: 900px) {
-  .syncChip { display: none; }
 }
 
 @media (max-width: 768px) {
   .dock { display: grid; }
   .main { padding-bottom: 110px; }
-  .searchButton { flex-basis: 44px; max-width: 44px; padding: 0; justify-content: center; }
-  .searchButton span, .searchButton kbd { display: none; }
-  .topLogo span { display: none; }
   .shell { --top: 60px; }
 }
 
 @media (max-width: 581px) {
-  .topbar { padding-inline: 14px; gap: 10px; }
-  .topLogo span { display: inline; }
 }
 
 @media (max-width: 390px) {
-  .topLogo span { display: none; }
 }
 
 @media (max-height: 860px) and (min-width: 1101px) {
