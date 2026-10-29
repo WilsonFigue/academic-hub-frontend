@@ -1,9 +1,10 @@
-import { ArrowLeft, CalendarClock, Check, FileText, Loader2, Printer, Sparkles, TriangleAlert } from 'lucide-react';
+import { ArrowLeft, CalendarClock, Check, FileText, Loader2, Printer, Shapes, Sparkles, TriangleAlert } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useActivity, useStudyGuide } from '../api/hooks';
 import type { StudyGuide } from '../api/types';
+import { GeoGebraPanel } from '../components/GeoGebraPanel';
 import { Skeleton } from '../components/ui';
 import { courseIcon } from '../lib/courseIcon';
 import { courseTitle, formatDate, formatDueRelative } from '../lib/format';
@@ -90,6 +91,7 @@ export function StudyGuidePage() {
     return () => observer.disconnect();
   }, [sections]);
 
+  const wantsGeoGebra = Boolean(guide?.tools.includes('geogebra'));
   const back = () => (window.history.length > 1 ? navigate(-1) : navigate('/activities', { replace: true }));
   const goTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
 
@@ -140,6 +142,7 @@ export function StudyGuidePage() {
                 </a>
               </li>
             ))}
+            {wantsGeoGebra && <li><a href="#geogebra" onClick={(event) => { event.preventDefault(); goTo('geogebra'); }}><span><Shapes size={12} aria-hidden="true" /></span>GeoGebra</a></li>}
             {content.sources.length > 0 && <li><a href="#fuentes" onClick={(event) => { event.preventDefault(); goTo('fuentes'); }}><span><FileText size={12} aria-hidden="true" /></span>Fuentes</a></li>}
           </ol>
         </nav>
@@ -149,6 +152,13 @@ export function StudyGuidePage() {
           {content.sections.map((section, index) => (
             <Section key={section.heading} guide={guide} heading={section.heading} body={section.body} bullets={section.bullets ?? []} index={index} reduce={reduce} />
           ))}
+          {wantsGeoGebra && (
+            <motion.section id="geogebra" className={styles.section} initial={reduce ? false : { opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45, ease }}>
+              <header><span className={styles.num} aria-hidden="true"><Shapes size={16} /></span><h2>Compruébalo en GeoGebra</h2></header>
+              <p>Esta actividad pide usar GeoGebra. Ábrelo aquí mismo para graficar y comprobar tu trabajo.</p>
+              <GeoGebraPanel />
+            </motion.section>
+          )}
           {content.sources.length > 0 && (
             <motion.section id="fuentes" className={styles.section} initial={reduce ? false : { opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45, ease }}>
               <header><span className={styles.num} aria-hidden="true"><FileText size={15} /></span><h2>Fuentes</h2></header>

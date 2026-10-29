@@ -286,6 +286,8 @@ export interface StudyGuideContent {
 export interface StudyGuide {
   id: string; status: 'requested' | 'generating' | 'ready' | 'failed'; trigger: 'manual' | 'routine';
   content: StudyGuideContent | null; model: string | null; errorCode: string | null; requestedAt: string; finishedAt: string | null;
+  /** Herramientas que la actividad pide usar (p. ej. 'geogebra'). */
+  tools: string[];
 }
 export interface StudyGuideState { activityId: string; courseEnabled: boolean; guide: StudyGuide | null; canRequest: boolean }
 export interface StudyGuideCourse { courseId: string; name: string; termName: string | null; enabled: boolean; ready: number; queued: number }
