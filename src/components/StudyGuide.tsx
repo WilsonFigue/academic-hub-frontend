@@ -1,9 +1,8 @@
-import { BookOpenCheck, ChevronDown, Clock3, Loader2, RotateCcw, Sparkles, TriangleAlert } from 'lucide-react';
-import { AnimatePresence, motion } from 'motion/react';
-import { useState } from 'react';
+import { ArrowUpRight, BookOpenCheck, Clock3, Loader2, RotateCcw, Sparkles, TriangleAlert } from 'lucide-react';
+import { motion } from 'motion/react';
+import { Link } from 'react-router-dom';
 import { ApiError } from '../api/client';
 import { useRequestStudyGuide, useSetStudyGuide, useStudyGuide, useStudyGuideSettings } from '../api/hooks';
-import type { StudyGuide } from '../api/types';
 import { courseTitle } from '../lib/format';
 import { useReducedMotion } from '../lib/motion';
 import { tintFor } from '../lib/tint';
@@ -71,32 +70,10 @@ export function CourseGuideToggle({ courseId }: { courseId: string }) {
   );
 }
 
-function GuideBody({ guide }: { guide: StudyGuide }) {
-  const content = guide.content;
-  if (!content) return null;
-  return (
-    <div className={styles.guideBody}>
-      {content.summary && <p className={styles.summary}>{content.summary}</p>}
-      {content.sections.map((section) => (
-        <section key={section.heading}>
-          <h4>{section.heading}</h4>
-          {section.body && <p style={{ whiteSpace: 'pre-line' }}>{section.body}</p>}
-          {section.bullets && section.bullets.length > 0 && <ul>{section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul>}
-        </section>
-      ))}
-      {content.sources.length > 0 && (
-        <p className={styles.sources}><b>Basada en:</b> {content.sources.map((source) => source.file).join(' · ')}</p>
-      )}
-    </div>
-  );
-}
-
 /** Bloque de la guía de estudio dentro del detalle de una actividad. */
 export function StudyGuideBlock({ activityId }: { activityId: string }) {
   const { data, isPending } = useStudyGuide(activityId);
   const request = useRequestStudyGuide(activityId);
-  const [open, setOpen] = useState(false);
-  const reduce = useReducedMotion();
   if (isPending || !data) return <Skeleton height={86} radius={20} />;
   const guide = data.guide;
   const requestError = request.error instanceof ApiError && request.error.code !== 'study_guide_exists' ? request.error.message : null;
@@ -125,19 +102,10 @@ export function StudyGuideBlock({ activityId }: { activityId: string }) {
           </button>
         )}
         {guide?.status === 'ready' && (
-          <button type="button" className={styles.secondary} aria-expanded={open} onClick={() => setOpen((value) => !value)}>
-            {open ? 'Ocultar' : 'Ver guía'}<ChevronDown size={16} aria-hidden="true" data-open={open} />
-          </button>
+          <Link className={styles.primary} to={`/activities/${activityId}/guide`}>Ver guía<ArrowUpRight size={16} aria-hidden="true" /></Link>
         )}
       </div>
       {requestError && <p className={styles.error} role="alert">{requestError}</p>}
-      <AnimatePresence initial={false}>
-        {guide?.status === 'ready' && open && (
-          <motion.div key="body" initial={reduce ? false : { height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3, ease }} style={{ overflow: 'hidden' }}>
-            <GuideBody guide={guide} />
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
