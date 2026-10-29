@@ -117,3 +117,19 @@ export const useMe = () => useQuery({ queryKey: keys.me, queryFn: () => api<{ us
 
 export const useTerms = () =>
   useQuery({ queryKey: ['terms'], queryFn: async () => (await api<{ terms: Term[] }>('/terms')).terms });
+
+/** Distribución guardada del tablero de actividades: orden de columnas, minimizadas y cerradas (null si nunca se guardó). */
+export type BoardLayout = { order: string[]; minimized: string[]; hidden: string[] };
+export const useBoardLayout = () =>
+  useQuery({
+    queryKey: ['preferences', 'activities_board'] as const,
+    queryFn: async () => (await api<{ value: BoardLayout | null }>('/me/preferences/activities_board')).value,
+    staleTime: Infinity,
+  });
+export function useSaveBoardLayout() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (value: BoardLayout) => (await api<{ value: BoardLayout }>('/me/preferences/activities_board', { method: 'PUT', body: { value } })).value,
+    onSuccess: (value) => queryClient.setQueryData(['preferences', 'activities_board'], value),
+  });
+}

@@ -19,7 +19,7 @@
 .segIcons { overflow: visible; }
 .segIcons .segBtn { min-width: 46px; padding: 0 12px; }
 .segIcons .segFace b { position: absolute; top: -12px; right: -14px; min-width: 18px; padding: 0 5px; font-size: 10.5px; background: var(--surface); box-shadow: 0 0 0 1.5px var(--panel-row); }
-.segIcons .segOn .segFace b { box-shadow: 0 0 0 1.5px var(--surface); }
+.segIcons .segOn .segFace b { background: var(--s); color: var(--inverse); box-shadow: 0 0 0 1.5px var(--surface); }
 .segIcons .segBtn::after { content: attr(data-tip); position: absolute; left: 50%; bottom: calc(100% + 12px); z-index: 5; padding: 5px 11px; border-radius: 10px; background: var(--text); color: var(--inverse); font-size: 12px; font-weight: 700; white-space: nowrap; opacity: 0; pointer-events: none; transform: translate(-50%, 6px) scale(0.92); transition: opacity var(--t-base) var(--ease-out), transform 260ms var(--ease-out); }
 .segIcons .segBtn:hover::after, .segIcons .segBtn:focus-visible::after { opacity: 1; transform: translate(-50%, 0); }
 
@@ -55,3 +55,16 @@
 @media (max-width: 581px) {
   .menuBtn { min-height: 42px; }
 }
+
+.optAction { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 40px; margin-top: 6px; border: 0; border-top: 1px solid var(--border); border-radius: 0 0 15px 15px; background: transparent; color: var(--muted); font-size: 13px; font-weight: 700; transition: color var(--t-fast) var(--ease-out), background-color var(--t-fast) var(--ease-out); }
+.optAction:hover:not(:disabled) { background: var(--panel-row); color: var(--text); }
+.optAction:disabled { opacity: 0.4; }
+.optAction:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+/* Botón de menú compacto: solo icono, con globo al pasar el mouse y marca cuando hay un filtro activo */
+.menuCompact { position: relative; justify-content: center; width: 46px; height: 46px; min-height: 46px; padding: 0; }
+.menuCompact svg:first-child { color: var(--s); }
+.menuCompact::after { content: attr(data-tip); position: absolute; left: 50%; bottom: calc(100% + 12px); z-index: 5; padding: 5px 11px; border-radius: 10px; background: var(--text); color: var(--inverse); font-size: 12px; font-weight: 700; white-space: nowrap; opacity: 0; pointer-events: none; transform: translate(-50%, 6px) scale(0.92); transition: opacity var(--t-base) var(--ease-out), transform 260ms var(--ease-out); }
+.menuCompact:hover::after, .menuCompact:focus-visible::after { opacity: 1; transform: translate(-50%, 0); }
+.menuDot { position: absolute; top: -3px; right: -3px; width: 14px; height: 14px; border-radius: 50%; background: var(--s); box-shadow: 0 0 0 3px var(--bg, var(--surface)); }
+.menuBadge { position: absolute; top: -9px; right: -9px; min-width: 22px; padding: 0 6px; border-radius: var(--radius-pill); background: var(--s); color: var(--inverse); font-size: 11px; font-weight: 800; line-height: 20px; text-align: center; box-shadow: 0 0 0 3px var(--bg, var(--surface)); }
