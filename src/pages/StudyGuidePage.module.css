@@ -88,7 +88,6 @@
   .section { padding: 20px 18px; border-radius: 24px; }
   .section h2 { font-size: 19px; }
   .steps li { padding-left: 54px; }
-  .print { display: none; }
 }
 
 /* Al imprimir o guardar en PDF solo queda la guía. */
@@ -105,3 +104,7 @@
 @media print {
   .section, .summary, .hero { opacity: 1 !important; transform: none !important; }
 }
+
+.pdfActions { display: flex; flex-wrap: wrap; gap: 8px; }
+.pdfActions a.print { text-decoration: none; }
+@media (max-width: 581px) { .pdfActions { width: 100%; } .pdfActions .print { flex: 1; justify-content: center; } }

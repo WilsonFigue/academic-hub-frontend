@@ -1,10 +1,11 @@
-import { ArrowLeft, CalendarClock, Check, FileText, Loader2, Printer, Shapes, Sparkles, TriangleAlert } from 'lucide-react';
+import { ArrowLeft, CalendarClock, Check, Download, FileText, Loader2, Shapes, Sparkles, TriangleAlert } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useActivity, useStudyGuide } from '../api/hooks';
+import { guidePdfUrl, useActivity, useStudyGuide } from '../api/hooks';
 import type { StudyGuide } from '../api/types';
 import { GeoGebraPanel } from '../components/GeoGebraPanel';
+import { GuidePdfViewer } from '../components/GuidePdfViewer';
 import { Skeleton } from '../components/ui';
 import { courseIcon } from '../lib/courseIcon';
 import { courseTitle, formatDate, formatDueRelative } from '../lib/format';
@@ -77,6 +78,7 @@ export function StudyGuidePage() {
   const Icon = courseIcon(activity ? courseTitle(activity.courseName) : '');
   const sections = useMemo(() => (content?.sections ?? []).map((section, index) => ({ ...section, id: slug(section.heading, index) })), [content]);
   const [current, setCurrent] = useState<string | null>(null);
+  const [pdfOpen, setPdfOpen] = useState(false);
 
   // Resalta en el índice la sección que se está leyendo.
   useEffect(() => {
@@ -116,7 +118,10 @@ export function StudyGuidePage() {
     <div className={styles.page} style={{ ['--c' as string]: tint.fg, ['--cbg' as string]: tint.bg }}>
       <div className={styles.toolbar}>
         <button type="button" className={styles.back} onClick={back}><ArrowLeft size={16} aria-hidden="true" />Volver</button>
-        <button type="button" className={styles.print} onClick={() => window.print()}><Printer size={16} aria-hidden="true" />Imprimir o guardar en PDF</button>
+        <div className={styles.pdfActions}>
+          <button type="button" className={styles.print} onClick={() => setPdfOpen(true)}><FileText size={16} aria-hidden="true" />Ver PDF</button>
+          <a className={styles.print} href={guidePdfUrl(activityId, true)} download><Download size={16} aria-hidden="true" />Descargar PDF</a>
+        </div>
       </div>
 
       <motion.header className={styles.hero} initial={reduce ? false : { opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease }}>
@@ -170,6 +175,7 @@ export function StudyGuidePage() {
           <p className={styles.disclaimer}>Esta guía la generó una IA a partir del material de tu materia. Revísala con tus apuntes y las instrucciones de tu docente: ayuda a entender la actividad, no la reemplaza.</p>
         </main>
       </div>
+      <GuidePdfViewer open={pdfOpen} activityId={activityId} title={title} onClose={() => setPdfOpen(false)} />
     </div>
   );
 }

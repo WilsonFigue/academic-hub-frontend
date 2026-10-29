@@ -201,3 +201,6 @@ export function useRequestStudyGuide(activityId: string) {
     onSettled: () => { void client.invalidateQueries({ queryKey: ['study-guide', activityId] }); void client.invalidateQueries({ queryKey: ['study-guide-settings'] }); },
   });
 }
+
+/** PDF de la guía de estudio: sin parámetros se abre en el visor; con download se descarga. */
+export const guidePdfUrl = (activityId: string, download = false) => `/api/v1/activities/${activityId}/study-guide/pdf${download ? '?download=1' : ''}`;
