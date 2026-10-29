@@ -1,5 +1,5 @@
 import {
-  ArrowLeftIcon, ArrowTopRightOnSquareIcon, CheckBadgeIcon, ExclamationTriangleIcon, FolderOpenIcon, SparklesIcon,
+  ArrowTopRightOnSquareIcon, CheckBadgeIcon, ExclamationTriangleIcon, FolderOpenIcon, SparklesIcon,
 } from '@heroicons/react/24/outline';
 import { motion } from 'motion/react';
 import { useReducedMotion } from '../lib/motion';
@@ -9,16 +9,17 @@ import { ApiError } from '../api/client';
 import { useCourse, useCourseContent, useCourseGrades } from '../api/hooks';
 import type { Activity } from '../api/types';
 import { ActivityDetail } from '../components/ActivityDetail';
-import { ActivityList } from '../components/ActivityList';
-import { ContentTree } from '../components/ContentTree';
+import { CourseActivities } from '../components/CourseActivities';
+import { CourseContent } from '../components/CourseContent';
+import { CourseGrades } from '../components/CourseGrades';
+import { CourseInfo } from '../components/CourseInfo';
+import { CourseHero, CourseSections, type CourseTab } from '../components/CourseHero';
 import { EvaluationCycles } from '../components/EvaluationCycles';
-import { Badge, Card, EmptyState, Skeleton, buttonClass } from '../components/ui';
-import { courseTitle, formatDate, formatDateTime, formatDueRelative } from '../lib/format';
-import { monogram, tintFor } from '../lib/tint';
-import styles from './Page.module.css';
+import { Card, EmptyState, Skeleton, buttonClass } from '../components/ui';
+import type { DashStatus } from '../lib/dashFilters';
 
-const TABS = ['activities', 'content', 'grades', 'cycles', 'info'] as const;
-type Tab = (typeof TABS)[number];
+const TABS: CourseTab[] = ['activities', 'content', 'grades', 'cycles', 'info'];
+type Tab = CourseTab;
 
 export function CourseDetailPage() {
   const { id = '' } = useParams();
@@ -29,6 +30,7 @@ export function CourseDetailPage() {
   const reduce = useReducedMotion();
   const requested = params.get('tab');
   const tab: Tab = TABS.includes(requested as Tab) ? (requested as Tab) : 'activities';
+  const [status, setStatus] = useState<DashStatus>('all');
   const [selected, setSelected] = useState<Activity | null>(null);
   // Carpetas abiertas del árbol: se conservan al cambiar de pestaña o abrir un detalle.
   const [openFolders, setOpenFolders] = useState<Set<string>>(new Set());
@@ -45,8 +47,6 @@ export function CourseDetailPage() {
   }
 
   const data = course.data;
-  const title = courseTitle(data.displayName ?? data.name);
-  const tone = tintFor(data.id);
   const all = grades.data ?? [];
   const activities = all.filter((activity) => !activity.isCalculated)
     .sort((a, b) => (a.dueAt ? Date.parse(a.dueAt) : Infinity) - (b.dueAt ? Date.parse(b.dueAt) : Infinity));
@@ -62,68 +62,33 @@ export function CourseDetailPage() {
 
   return (
     <div>
-      <Link to="/courses" className={styles.backLink}><ArrowLeftIcon aria-hidden="true" />Mis materias</Link>
-      <header className={styles.header}>
-        <div className={styles.courseHead}>
-          <span className={styles.courseHeadMark} style={{ background: tone.bg, color: tone.fg }} aria-hidden="true">{monogram(title)}</span>
-          <div style={{ minWidth: 0 }}>
-            <h1 className={styles.title}>{title}</h1>
-            <div className={styles.metaRow}>
-              <span className={styles.metaChip}>{data.term?.name ?? 'Sin período'}</span>
-              {data.courseCode && <span className={styles.metaChip}>{data.courseCode}</span>}
-              <span className={styles.metaChip}><Badge tone={data.isAvailable === false ? 'neutral' : 'success'}>{data.isAvailable === false ? 'No disponible' : 'Disponible'}</Badge></span>
-              {data.nextDueAt && <span className={styles.metaChip}>Próximo vencimiento {formatDateTime(data.nextDueAt)} ({formatDueRelative(data.nextDueAt)})</span>}
-            </div>
-          </div>
-        </div>
-        {data.lmsUrl && (
+      <CourseHero course={data} activities={activities} contentCount={content.data?.length} status={status} onStatus={setStatus} onOpen={setSelected} onTab={setTab}
+        action={data.lmsUrl ? (
           <a href={data.lmsUrl} target="_blank" rel="noopener noreferrer" className={buttonClass('secondary')}>
             Abrir en Blackboard<ArrowTopRightOnSquareIcon aria-hidden="true" width={18} height={18} />
             <span className="visually-hidden"> (se abre en otra pestaña)</span>
           </a>
-        )}
-      </header>
+        ) : undefined} />
 
-      <div className={styles.tabs} role="tablist" aria-label="Secciones de la materia">
-        {tabs.map((item) => (
-          <button key={item.id} type="button" role="tab" id={`tab-${item.id}`} aria-controls={`panel-${item.id}`}
-            aria-selected={tab === item.id} className={styles.tab} onClick={() => setTab(item.id)}>
-            {item.label}{item.count !== undefined && <span className={styles.tabCount}>{item.count}</span>}
-            {tab === item.id && <motion.span layoutId="course-tab" className={styles.tabLine} transition={{ type: 'spring', stiffness: 500, damping: 40 }} />}
-          </button>
-        ))}
-      </div>
+      <CourseSections tab={tab} tabs={tabs} onChange={setTab} />
 
       <motion.div key={tab} role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`}
-        initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}>
-        <Card>
-          {tab === 'activities' && (grades.isPending ? <Skeleton height={240} /> : activities.length > 0
-            ? <ActivityList activities={activities} showCourse={false} onSelect={setSelected} />
-            : <EmptyState icon={<SparklesIcon />} title="Sin actividades evaluables">Esta materia todavía no tiene actividades publicadas en el libro de calificaciones.</EmptyState>)}
+        initial={reduce ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
+        {tab === 'activities' && (grades.isPending ? <Skeleton height={240} radius={22} /> : activities.length > 0
+          ? <CourseActivities activities={activities} status={status} onStatus={setStatus} onSelect={setSelected} />
+          : <Card><EmptyState icon={<SparklesIcon />} title="Sin actividades evaluables">Esta materia todavía no tiene actividades publicadas en el libro de calificaciones.</EmptyState></Card>)}
 
-          {tab === 'content' && (content.isPending ? <Skeleton height={240} /> : content.data && content.data.length > 0
-            ? <ContentTree items={content.data} open={openFolders} onOpenChange={setOpenFolders} />
-            : <EmptyState icon={<FolderOpenIcon />} title="Sin contenido visible">No hay contenido disponible para tu inscripción en esta materia.</EmptyState>)}
+        {tab === 'content' && (content.isPending ? <Skeleton height={240} radius={22} /> : content.data && content.data.length > 0
+          ? <CourseContent items={content.data} open={openFolders} onOpenChange={setOpenFolders} />
+          : <Card><EmptyState icon={<FolderOpenIcon />} title="Sin contenido visible">No hay contenido disponible para tu inscripción en esta materia.</EmptyState></Card>)}
 
-          {tab === 'grades' && (grades.isPending ? <Skeleton height={240} /> : graded.length > 0
-            ? <ActivityList activities={graded} showCourse={false} showScore onSelect={setSelected} />
-            : <EmptyState icon={<CheckBadgeIcon />} title="Sin calificaciones publicadas">Tus notas aparecerán aquí cuando el docente las publique.</EmptyState>)}
+        {tab === 'grades' && (grades.isPending ? <Skeleton height={240} radius={22} /> : graded.length > 0
+          ? <CourseGrades activities={all} onSelect={setSelected} />
+          : <Card><EmptyState icon={<CheckBadgeIcon />} title="Sin calificaciones publicadas">Tus notas aparecerán aquí cuando el docente las publique.</EmptyState></Card>)}
 
-          {tab === 'cycles' && (grades.isPending ? <Skeleton height={240} /> : <EvaluationCycles courseId={id} activities={all} />)}
+        {tab === 'cycles' && <Card>{grades.isPending ? <Skeleton height={240} /> : <EvaluationCycles courseId={id} activities={all} />}</Card>}
 
-          {tab === 'info' && (
-            <dl className={styles.dl}>
-              <div><dt>Nombre oficial</dt><dd>{data.name}</dd></div>
-              <div><dt>Código</dt><dd>{data.courseCode ?? '—'}</dd></div>
-              <div><dt>Período</dt><dd>{data.term ? `${data.term.name} (${formatDate(data.term.startAt)} – ${formatDate(data.term.endAt)})` : '—'}</dd></div>
-              <div><dt>Rol</dt><dd>{data.enrollment.role ?? '—'}</dd></div>
-              <div><dt>Inscripción</dt><dd>{formatDate(data.enrollment.enrolledAt)}</dd></div>
-              <div><dt>Último acceso en Blackboard</dt><dd>{formatDateTime(data.enrollment.lastAccessAt)}</dd></div>
-              <div><dt>Datos actualizados</dt><dd>{formatDateTime(data.lastSeenAt)}</dd></div>
-              {data.description && <div style={{ gridColumn: '1 / -1' }}><dt>Descripción</dt><dd>{data.description}</dd></div>}
-            </dl>
-          )}
-        </Card>
+        {tab === 'info' && <CourseInfo course={data} />}
       </motion.div>
 
       <ActivityDetail activityId={selected?.id ?? null} onClose={() => setSelected(null)} />

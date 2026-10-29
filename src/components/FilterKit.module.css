@@ -1,0 +1,57 @@
+/* Filtros de la materia: selector rápido con píldora y menús con icono. */
+
+.seg { display: inline-flex; align-items: stretch; gap: 2px; max-width: 100%; padding: 4px; overflow-x: auto; border-radius: var(--radius-pill); background: var(--panel-row); scrollbar-width: none; }
+.seg::-webkit-scrollbar { display: none; }
+
+.segBtn { --s: var(--text); position: relative; flex: none; min-height: 40px; padding: 0 15px; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--muted); font-size: var(--fs-body); font-weight: 700; transition: color var(--t-base) var(--ease-out), transform var(--t-base) var(--ease-out); }
+.segPill { position: absolute; inset: 0; border-radius: var(--radius-pill); background: var(--surface); box-shadow: 0 4px 14px color-mix(in srgb, var(--s) 24%, transparent), inset 0 0 0 1.5px color-mix(in srgb, var(--s) 45%, transparent); }
+.segFace { position: relative; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.segFace svg { color: var(--s); transition: transform 360ms var(--ease-out); }
+.segFace b { min-width: 22px; padding: 1px 7px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--text) 8%, transparent); font-size: 12px; text-align: center; transition: background-color var(--t-base) var(--ease-out), color var(--t-base) var(--ease-out); }
+.segBtn:hover:not(:disabled) { color: var(--text); }
+.segBtn:hover:not(:disabled) .segFace svg { transform: scale(1.2) rotate(-8deg); }
+.segBtn:disabled { opacity: 0.4; }
+.segBtn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.segOn { color: var(--text); }
+.segOn .segFace b { background: var(--s); color: var(--inverse); }
+
+/* Solo iconos: el nombre aparece como globo al pasar el mouse o enfocar */
+.segIcons { overflow: visible; }
+.segIcons .segBtn { min-width: 46px; padding: 0 12px; }
+.segIcons .segFace b { position: absolute; top: -12px; right: -14px; min-width: 18px; padding: 0 5px; font-size: 10.5px; background: var(--surface); box-shadow: 0 0 0 1.5px var(--panel-row); }
+.segIcons .segOn .segFace b { box-shadow: 0 0 0 1.5px var(--surface); }
+.segIcons .segBtn::after { content: attr(data-tip); position: absolute; left: 50%; bottom: calc(100% + 12px); z-index: 5; padding: 5px 11px; border-radius: 10px; background: var(--text); color: var(--inverse); font-size: 12px; font-weight: 700; white-space: nowrap; opacity: 0; pointer-events: none; transform: translate(-50%, 6px) scale(0.92); transition: opacity var(--t-base) var(--ease-out), transform 260ms var(--ease-out); }
+.segIcons .segBtn:hover::after, .segIcons .segBtn:focus-visible::after { opacity: 1; transform: translate(-50%, 0); }
+
+/* ── Botón de menú ── */
+.menuBtn { --s: var(--accent); display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 12px 0 14px; border: 1.5px solid var(--border); border-radius: var(--radius-pill); background: var(--surface); color: var(--muted); font-size: var(--fs-body); font-weight: 700; text-align: left; transition: border-color var(--t-base) var(--ease-out), background-color var(--t-base) var(--ease-out), box-shadow var(--t-base) var(--ease-out), transform var(--t-base) var(--ease-out); }
+.menuBtn svg:first-child { flex: none; color: var(--s); transition: transform 360ms var(--ease-out); }
+.menuText { display: grid; line-height: 1.15; color: var(--text); }
+.menuText small { font-size: 10.5px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--faint); }
+.menuChev { flex: none; transition: transform 320ms var(--ease-out); }
+.menuBtn:hover { border-color: color-mix(in srgb, var(--s) 55%, var(--border)); box-shadow: 0 8px 18px color-mix(in srgb, var(--s) 15%, transparent); }
+.menuBtn:hover svg:first-child { transform: scale(1.18) rotate(-8deg); }
+.menuBtn:active { background: color-mix(in srgb, var(--s) 14%, var(--surface)); }
+.menuBtn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.menuActive { border-color: var(--s); background: color-mix(in srgb, var(--s) 10%, var(--surface)); }
+.menuOpen { border-color: var(--s); box-shadow: 0 0 0 4px color-mix(in srgb, var(--s) 16%, transparent); }
+.menuOpen .menuChev { transform: rotate(180deg); }
+
+/* ── Lista desplegada ── */
+.panel { z-index: var(--z-sheet); display: grid; gap: 2px; width: 290px; max-width: calc(100vw - 24px); padding: 8px; border: 1px solid var(--border); border-radius: 22px; background: var(--surface); box-shadow: 0 24px 60px rgb(20 26 36 / 0.22); transform-origin: top left; }
+.panelTitle { margin: 4px 10px 6px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); }
+.opt { --s: var(--accent); display: flex; align-items: center; gap: 12px; width: 100%; min-height: 46px; padding: 6px 12px 6px 8px; border: 0; border-radius: 15px; background: transparent; color: var(--text); font-size: var(--fs-body); font-weight: 700; text-align: left; transition: background-color var(--t-fast) var(--ease-out); }
+.optIcon { display: grid; flex: none; place-items: center; width: 32px; height: 32px; border-radius: 11px; background: color-mix(in srgb, var(--s) 14%, var(--surface)); color: var(--s); transition: transform 320ms var(--ease-out), background-color var(--t-base) var(--ease-out), color var(--t-base) var(--ease-out); }
+.optIcon i { width: 8px; height: 8px; border-radius: 50%; background: var(--s); }
+.optText { display: grid; flex: 1; min-width: 0; line-height: 1.25; }
+.optText small { font-size: 12px; font-weight: 600; color: var(--muted); }
+.opt b { padding: 1px 8px; border-radius: var(--radius-pill); background: var(--panel-row); color: var(--muted); font-size: 12px; }
+.optCheck { flex: none; color: var(--s); opacity: 0; transform: scale(0.4); transition: opacity var(--t-base) var(--ease-out), transform 320ms var(--ease-out); }
+.opt:hover, .opt:focus-visible { outline: none; background: color-mix(in srgb, var(--s) 9%, var(--surface)); }
+.opt:hover .optIcon { transform: rotate(-8deg) scale(1.1); background: var(--s); color: var(--inverse); }
+.optOn { background: color-mix(in srgb, var(--s) 12%, var(--surface)); }
+.optOn .optCheck { opacity: 1; transform: none; }
+
+@media (max-width: 581px) {
+  .menuBtn { min-height: 42px; }
+}

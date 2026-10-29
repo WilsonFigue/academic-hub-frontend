@@ -1,0 +1,94 @@
+/* Pestaña Contenido: filtros por tipo y árbol de recursos con color por tipo. */
+
+.tools { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 12px; margin-bottom: 18px; padding-top: 10px; }
+.menus { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.search { margin-left: auto; display: flex; align-items: center; gap: 8px; width: 260px; max-width: 100%; height: 40px; padding: 0 10px 0 13px; border: 1.5px solid var(--border); border-radius: var(--radius-pill); background: var(--surface); color: var(--faint); transition: border-color var(--t-base) var(--ease-out), width 320ms var(--ease-out), box-shadow var(--t-base) var(--ease-out); }
+.search:focus-within { width: 340px; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); color: var(--accent-ink); }
+.search input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--text); font-size: var(--fs-body); font-weight: 600; box-shadow: none; }
+.search input:focus, .search input:focus-visible { outline: none; box-shadow: none; }
+.clear { display: grid; place-items: center; width: 24px; height: 24px; border: 0; border-radius: 50%; background: var(--panel-row); color: var(--muted); }
+.clear:hover { background: var(--text); color: var(--inverse); }
+
+.reset { margin-left: 14px; min-height: 28px; padding: 0 13px; border: 0; border-radius: var(--radius-pill); background: var(--text); color: var(--inverse); font-size: 12.5px; font-weight: 700; }
+.reset:hover { background: var(--accent); }
+.count { display: flex; align-items: center; margin: 0 0 12px 4px; font-size: var(--fs-body); font-weight: 600; color: var(--muted); }
+
+.fold { display: flex; gap: 6px; margin: 0 0 12px 2px; }
+.fold button { min-height: 32px; padding: 0 14px; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--muted); font-size: 13px; font-weight: 700; transition: background-color var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out); }
+.fold button:hover:not(:disabled) { background: var(--panel-row); color: var(--text); }
+.fold button:disabled { opacity: 0.4; }
+
+/* ── Árbol ── */
+.tree, .children { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.li { --k: var(--muted); min-width: 0; }
+
+.node {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 68px;
+  padding: 10px 16px 10px 10px;
+  border: 0;
+  border-radius: 22px;
+  background: var(--panel-row);
+  color: var(--text);
+  text-align: left;
+  text-decoration: none;
+  transition: background-color var(--t-base) var(--ease-out), transform 320ms var(--ease-out), box-shadow 320ms var(--ease-out);
+}
+
+a.node:hover, button.node:hover { background: color-mix(in srgb, var(--k) 8%, var(--surface)); box-shadow: 0 12px 26px color-mix(in srgb, var(--k) 14%, transparent); transform: translateY(-2px); text-decoration: none; }
+.node::after { content: ''; position: absolute; inset: auto 0 -5px; height: 5px; }
+.node:active:not(.nodeStatic) { transform: translateY(-1px); }
+.node:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.liOpen > .node { background: color-mix(in srgb, var(--k) 11%, var(--surface)); }
+
+.disc { display: grid; flex: none; place-items: center; width: 48px; height: 48px; border-radius: 16px; background: color-mix(in srgb, var(--k) 15%, var(--surface)); color: var(--k); transition: transform 360ms var(--ease-out), background-color var(--t-base) var(--ease-out), color var(--t-base) var(--ease-out), box-shadow var(--t-base) var(--ease-out); }
+.node:hover .disc, .liOpen > .node .disc { background: var(--k); color: var(--inverse); box-shadow: 0 8px 16px color-mix(in srgb, var(--k) 36%, transparent); }
+a.node:hover .disc, button.node:hover .disc { transform: rotate(-7deg) scale(1.08); }
+
+.text { display: grid; flex: 1; gap: 5px; min-width: 0; }
+.title { font-size: 15px; font-weight: 700; letter-spacing: -0.005em; line-height: 1.3; overflow-wrap: anywhere; }
+.meta { display: flex; flex-wrap: wrap; align-items: center; gap: 3px 12px; font-size: 12.5px; color: var(--muted); }
+.type { padding: 1px 9px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--k) 14%, var(--surface)); color: var(--k); font-size: 11px; font-weight: 800; letter-spacing: 0.03em; text-transform: uppercase; }
+.path { flex-basis: 100%; overflow: hidden; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.due { color: var(--bad); font-weight: 700; }
+.lock { display: inline-flex; align-items: center; gap: 4px; color: var(--warning); font-weight: 700; }
+.done { display: inline-flex; align-items: center; gap: 7px; font-weight: 700; }
+.done i { width: 52px; height: 6px; overflow: hidden; border-radius: 6px; background: var(--border); }
+.done b { display: block; height: 100%; border-radius: 6px; background: var(--ok); }
+
+.chev { flex: none; color: var(--faint); transition: transform 320ms var(--ease-out), color var(--t-base) var(--ease-out); }
+.node:hover .chev { color: var(--k); }
+.liOpen > .node .chev { transform: rotate(90deg); color: var(--k); }
+
+.open { display: inline-flex; flex: none; align-items: center; gap: 6px; padding: 7px 13px; border-radius: var(--radius-pill); background: var(--surface); color: var(--k); font-size: 12.5px; font-weight: 800; opacity: 0; transform: translateX(8px); transition: opacity var(--t-base) var(--ease-out), transform 320ms var(--ease-out); }
+a.node:hover .open, a.node:focus-visible .open { opacity: 1; transform: none; }
+
+.excerpt { margin: 6px 0 2px 72px; max-width: 76ch; font-size: 13.5px; line-height: 1.5; color: var(--muted); }
+
+/* Hijos: sangría con una guía del color de la carpeta */
+.children { position: relative; margin: 8px 0 4px 24px; padding-left: 18px; overflow: hidden; }
+.children::before { content: ''; position: absolute; inset: 6px auto 6px 0; width: 3px; border-radius: 3px; background: color-mix(in srgb, var(--k) 38%, transparent); }
+
+/* ── Puntos de quiebre ── */
+@media (max-width: 768px) {
+  .search, .search:focus-within { width: 100%; }
+  .chips { flex-basis: 100%; }
+  .children { margin-left: 14px; padding-left: 12px; }
+}
+
+@media (max-width: 581px) {
+  .node { gap: 11px; min-height: 62px; padding: 9px 12px 9px 9px; border-radius: 18px; }
+  .disc { width: 42px; height: 42px; border-radius: 14px; }
+  .open { display: none; }
+  .excerpt { margin-left: 8px; }
+}
+
+@media (max-width: 390px) {
+  .title { font-size: 14.5px; }
+  .children { margin-left: 8px; padding-left: 10px; }
+}

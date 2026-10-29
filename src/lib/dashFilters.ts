@@ -39,3 +39,27 @@ export function matchesStatus(activity: Activity, status: DashStatus): boolean {
   }
   return group === status;
 }
+
+export type StatusKey = Exclude<DashStatus, 'all' | 'low'>;
+export const STATUS_ORDER: StatusKey[] = ['pending', 'overdue', 'submitted', 'graded', 'nodate'];
+
+/** Estado único de una actividad (el que usan los chips, la cinta y los grupos de la materia). */
+export function statusKeyOf(activity: Activity): StatusKey {
+  if (matchesStatus(activity, 'overdue')) return 'overdue';
+  if (matchesStatus(activity, 'graded')) return 'graded';
+  if (matchesStatus(activity, 'submitted')) return 'submitted';
+  if (matchesStatus(activity, 'nodate')) return 'nodate';
+  return 'pending';
+}
+
+/** Promedio real: puntos obtenidos entre puntos posibles de lo calificado (sin columnas calculadas ni exentas). */
+export function averagePct(activities: Activity[]): number | null {
+  let got = 0; let max = 0;
+  for (const a of activities) {
+    if (a.isCalculated || a.isExempt) continue;
+    const possible = Number(a.pointsPossible);
+    if (!(possible > 0) || (a.score === null && !a.isAutoZero)) continue;
+    got += Number(a.score ?? 0); max += possible;
+  }
+  return max > 0 ? (got / max) * 100 : null;
+}
