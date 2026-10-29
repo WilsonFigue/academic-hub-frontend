@@ -1,7 +1,7 @@
 import { BadgeCheck, CalendarClock, ExternalLink, Info, Layers, Send, Tag, Target, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useReducedMotion } from '../lib/motion';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useActivity } from '../api/hooks';
 import type { Activity } from '../api/types';
@@ -11,6 +11,7 @@ import { activityKind, categoryLabel, courseTitle, formatDateTime, formatDueRela
 import { activityStatus } from '../lib/status';
 import { tintFor } from '../lib/tint';
 import { Badge, Skeleton } from './ui';
+import { FileViewer, fileLook, formatBytes, type ViewerTarget } from './FileViewer';
 import styles from './ActivityDetail.module.css';
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -51,6 +52,7 @@ export function ActivityDetail({ activityId, onClose }: { activityId: string | n
   const reduce = useReducedMotion();
   const closeRef = useRef<HTMLButtonElement>(null);
   const opener = useRef<Element | null>(null);
+  const [viewing, setViewing] = useState<ViewerTarget | null>(null);
 
   useEffect(() => {
     if (!activityId) return;
@@ -82,6 +84,7 @@ export function ActivityDetail({ activityId, onClose }: { activityId: string | n
   ] : [];
 
   return (
+    <>
     <AnimatePresence>
       {activityId && (
         <>
@@ -155,6 +158,28 @@ export function ActivityDetail({ activityId, onClose }: { activityId: string | n
                     </motion.section>
                   )}
 
+                  {data.guides.length > 0 && (
+                    <motion.section aria-labelledby="guides-title" {...rise(4)}>
+                      <h3 id="guides-title" className={styles.subhead}>{data.guides.length === 1 ? 'Guía de esta actividad' : 'Guías y material de esta actividad'}</h3>
+                      <ul className={styles.guides}>
+                        {data.guides.map((guide) => {
+                          const look = fileLook(guide.mimeType, guide.fileName);
+                          return (
+                            <li key={guide.id}>
+                              <button type="button" className={styles.guide} style={{ ['--k' as string]: look.color }}
+                                onClick={() => setViewing({ courseId: guide.courseId, id: guide.id, title: guide.title, handler: 'resource/x-bb-file', file: { name: guide.fileName, mimeType: guide.mimeType, size: guide.size }, lmsUrl: activity.lmsUrl })}>
+                                <span className={styles.guideIcon}><look.icon size={20} aria-hidden="true" /></span>
+                                <span className={styles.guideText}><b>{guide.title}</b><small>{look.tag} · {formatBytes(guide.size)}</small></span>
+                                <span className={styles.guideOpen}>Ver</span>
+                              </button>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                      <p className={styles.note}>Son los archivos que el docente puso en la misma carpeta que esta actividad.</p>
+                    </motion.section>
+                  )}
+
                   {activity.feedbackText && (
                     <motion.section aria-labelledby="feedback-title" {...rise(5)}>
                       <h3 id="feedback-title" className={styles.subhead}>Retroalimentación</h3>
@@ -197,5 +222,7 @@ export function ActivityDetail({ activityId, onClose }: { activityId: string | n
         </>
       )}
     </AnimatePresence>
+    <FileViewer target={viewing} onClose={() => setViewing(null)} />
+    </>
   );
 }

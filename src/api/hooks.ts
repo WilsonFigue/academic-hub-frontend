@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError, api } from './client';
 import type {
-  Activity, Attempt, CalendarItem, Change, ContentItem, Course, Dashboard, EvaluationCycles, PublicUser, SaveCyclesInput, SessionResponse, Term, UniversityAccount,
+  Activity, ActivityGuide, Attempt, ContentPreview, CalendarItem, Change, ContentItem, Course, Dashboard, EvaluationCycles, PublicUser, SaveCyclesInput, SessionResponse, Term, UniversityAccount,
 } from './types';
 
 export const keys = {
@@ -80,7 +80,7 @@ export const useActivities = (status?: 'pending' | 'submitted' | 'graded') =>
 export const useActivity = (id: string | null) =>
   useQuery({
     queryKey: keys.activity(id ?? ''),
-    queryFn: () => api<{ activity: Activity; attempts: Attempt[] }>(`/activities/${id}`),
+    queryFn: () => api<{ activity: Activity; attempts: Attempt[]; guides: ActivityGuide[] }>(`/activities/${id}`),
     enabled: Boolean(id),
   });
 export const useGrades = () =>
@@ -131,5 +131,33 @@ export function useSaveBoardLayout() {
   return useMutation({
     mutationFn: async (value: BoardLayout) => (await api<{ value: BoardLayout }>('/me/preferences/activities_board', { method: 'PUT', body: { value } })).value,
     onSuccess: (value) => queryClient.setQueryData(['preferences', 'activities_board'], value),
+  });
+}
+
+/** Dirección del archivo de un contenido (se sirve desde la API con la sesión de Academic Hub). */
+export const fileUrl = (courseId: string, contentId: string, download = false) => `/api/v1/courses/${courseId}/content/${contentId}/file${download ? '?download=1' : ''}`;
+
+/** El documento tal cual: PDF tal como está; Word, PowerPoint y Excel convertidos a PDF (la primera vez tarda unos segundos). */
+export const renderUrl = (courseId: string, contentId: string) => `/api/v1/courses/${courseId}/content/${contentId}/render`;
+
+/** Vista previa (texto y estructura) de un contenido, más su estado de revisado. La primera vez puede tardar: descarga el archivo de Blackboard. */
+export const useContentPreview = (courseId: string, contentId: string, enabled = true) =>
+  useQuery({
+    queryKey: ['content-preview', contentId] as const,
+    queryFn: () => api<ContentPreview>(`/courses/${courseId}/content/${contentId}/preview`),
+    enabled,
+    staleTime: 60_000,
+    retry: false,
+  });
+
+/** Marca o desmarca un contenido como revisado (se envía a Blackboard en la siguiente actualización). */
+export function useSetReviewed(courseId: string, contentId: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (reviewed: boolean) => api<{ review: ContentPreview['review'] }>(`/courses/${courseId}/content/${contentId}/reviewed`, { method: 'PUT', body: { reviewed } }),
+    onSuccess: () => {
+      void client.invalidateQueries({ queryKey: ['content-preview', contentId] });
+      void client.invalidateQueries({ queryKey: keys.courseContent(courseId) });
+    },
   });
 }

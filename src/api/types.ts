@@ -125,6 +125,52 @@ export interface ContentItem {
   modifiedAt: string | null;
   visibility: string | null;
   completion: { total?: number; completed?: number; started?: number } | null;
+  /** Archivo subido por el docente (solo en recursos de tipo archivo). */
+  file: { name: string; mimeType: string; size: number } | null;
+  /** Marca de "revisado" pedida por el estudiante y su estado de envío a Blackboard. */
+  review: ReviewMark | null;
+}
+
+export interface ReviewMark {
+  state: 'pending' | 'sent' | 'failed';
+  markedAt: string;
+  sentAt: string | null;
+  alreadyCompleted: boolean;
+  /** Solo en la respuesta al marcar: el envío inmediato a UTEC no se pudo y quedó pendiente. */
+  sendFailed?: boolean;
+}
+
+export type Preview =
+  | { kind: 'docx'; html: string; text: string; images: number }
+  | { kind: 'pptx'; slides: Array<{ n: number; title: string; lines: string[] }>; text: string }
+  | { kind: 'xlsx'; sheets: Array<{ name: string; rows: string[][]; truncated: boolean }>; text: string }
+  | { kind: 'pdf'; pages: number; text: string; scanned: boolean }
+  | { kind: 'text'; text: string }
+  | { kind: 'document'; html: string; text: string }
+  | { kind: 'link'; url: string }
+  | { kind: 'none'; reason: 'empty' | 'too_large' | 'unsupported' | 'unreadable' };
+
+export interface ContentPreview {
+  title: string;
+  handler: string;
+  fileName: string | null;
+  mimeType: string | null;
+  size: number | null;
+  completion: ContentItem['completion'];
+  review: ReviewMark | null;
+  /** Cómo se puede ver tal cual: 'pdf' (visor del navegador), 'office' (convertido a PDF con Office en el servidor) o null (solo la vista de texto). */
+  render: 'pdf' | 'office' | null;
+  preview: Preview;
+}
+
+/** Archivo que comparte carpeta con una actividad (su guía). */
+export interface ActivityGuide {
+  id: string;
+  courseId: string;
+  title: string;
+  fileName: string;
+  mimeType: string;
+  size: number;
 }
 
 export interface SyncRun {

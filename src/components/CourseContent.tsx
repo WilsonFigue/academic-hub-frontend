@@ -1,5 +1,5 @@
 import {
-  ArrowDownAZ, CalendarArrowDown, CalendarArrowUp, CalendarClock, ChevronRight, ClipboardCheck, Layers as LayersAll, ListOrdered, FileType, ExternalLink, File, FileArchive, FileImage, FileSpreadsheet, FileText, FileVideo, Folder, FolderOpen, Layers, Link2, Lock, MessagesSquare, Presentation, Search, X,
+  ArrowDownAZ, BookOpenCheck, CalendarArrowDown, CalendarArrowUp, CalendarClock, ChevronRight, ClipboardCheck, Layers as LayersAll, ListOrdered, FileType, ExternalLink, File, FileArchive, FileImage, FileSpreadsheet, FileText, Eye, FileVideo, Folder, FolderOpen, Layers, Link2, Lock, MessagesSquare, Presentation, Search, X,
   type LucideIcon,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
@@ -8,6 +8,7 @@ import type { ContentItem } from '../api/types';
 import { useReducedMotion } from '../lib/motion';
 import { formatRelative, formatShortDate, handlerLabel } from '../lib/format';
 import { Highlight, normalize } from './Filters';
+import { fileLook, formatBytes } from './FileViewer';
 import { FilterMenu, SegTabs } from './FilterKit';
 import styles from './CourseContent.module.css';
 
@@ -56,12 +57,20 @@ const FILE_TYPES: Array<[RegExp, { tag: string; icon: LucideIcon; color: string 
 function look(item: ContentItem) {
   const kind = kindOf(item);
   const base = KINDS[kind];
+  if (kind === 'file' && item.file) {
+    const found = fileLook(item.file.mimeType, item.file.name);
+    return { kind, ...base, icon: found.icon, color: found.color, tag: found.tag };
+  }
   if (kind === 'file' || kind === 'link' || kind === 'other') {
     const found = FILE_TYPES.find(([re]) => re.test(item.title) || re.test(item.externalUrl ?? ''));
     if (found) return { kind, ...base, icon: found[1].icon, color: found[1].color, tag: found[1].tag };
   }
   return { kind, ...base, tag: null as string | null };
 }
+
+const isYouTube = (url: string | null) => /^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\//.test(url ?? '');
+/** Archivos, documentos con texto y videos de YouTube se abren en el visor; el resto, como siempre. */
+const viewable = (item: ContentItem) => Boolean(item.file) || (item.handler === 'resource/x-bb-document' && Boolean(item.bodyText)) || isYouTube(item.externalUrl);
 
 type Sort = 'original' | 'new' | 'old' | 'name' | 'due';
 const SORTS = [
@@ -100,8 +109,8 @@ function buildTree(items: ContentItem[], sortBy: Sort = 'original'): Node[] {
   return roots;
 }
 
-function Row({ node, open, toggle, query, flatPath, depth = 0, index = 0 }: {
-  node: Node; open: Set<string>; toggle: (id: string) => void; query: string; flatPath?: string; depth?: number; index?: number;
+function Row({ node, open, toggle, query, flatPath, depth = 0, index = 0, onView }: {
+  node: Node; open: Set<string>; toggle: (id: string) => void; query: string; flatPath?: string; depth?: number; index?: number; onView: (item: ContentItem) => void;
 }) {
   const reduce = useReducedMotion();
   const v = look(node);
@@ -120,7 +129,9 @@ function Row({ node, open, toggle, query, flatPath, depth = 0, index = 0 }: {
           <span className={styles.type}>{v.tag ?? v.label}</span>
           {isFolder && <span>{node.children.length} {node.children.length === 1 ? 'elemento' : 'elementos'}</span>}
           {node.dueAt && <span className={styles.due}>vence {formatShortDate(node.dueAt)}</span>}
+          {node.file && <span>{formatBytes(node.file.size)}</span>}
           {node.modifiedAt && !isFolder && <span>actualizado {formatRelative(node.modifiedAt)}</span>}
+          {node.review && <span className={cx(styles.read, styles[`read_${node.review.state}`])}><BookOpenCheck size={12} aria-hidden="true" />{node.review.alreadyCompleted ? 'Ya completado en UTEC' : node.review.state === 'pending' ? 'Leído · por enviar a UTEC' : node.review.state === 'sent' ? 'Leído · enviado a UTEC' : 'No se pudo enviar'}</span>}
           {node.visibility === 'PARTIALLY_VISIBLE' && <span className={styles.lock}><Lock size={12} aria-hidden="true" />condicionado</span>}
           {done !== null && <span className={styles.done}><i><b style={{ width: `${done}%` }} /></i>{done}%</span>}
         </span>
@@ -136,6 +147,10 @@ function Row({ node, open, toggle, query, flatPath, depth = 0, index = 0 }: {
         <button type="button" className={cx(styles.node, styles.nodeFolder)} onClick={() => toggle(node.id)} aria-expanded={isOpen}>
           {inner}<ChevronRight className={styles.chev} size={20} aria-hidden="true" />
         </button>
+      ) : viewable(node) ? (
+        <button type="button" className={styles.node} onClick={() => onView(node)}>
+          {inner}<span className={styles.open}><Eye size={15} aria-hidden="true" />Ver</span>
+        </button>
       ) : node.externalUrl ? (
         <a className={styles.node} href={node.externalUrl} target="_blank" rel="noopener noreferrer">
           {inner}<span className={styles.open}><ExternalLink size={15} aria-hidden="true" />Abrir</span><span className="visually-hidden">(se abre en otra pestaña)</span>
@@ -146,7 +161,7 @@ function Row({ node, open, toggle, query, flatPath, depth = 0, index = 0 }: {
         {isOpen && (
           <motion.ul className={styles.children} initial={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }} animate={reduce ? { opacity: 1 } : { height: 'auto', opacity: 1 }}
             exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0, transition: { duration: 0.18 } }} transition={{ duration: 0.3, ease }}>
-            {node.children.map((child, i) => <Row key={child.id} node={child} open={open} toggle={toggle} query={query} depth={depth + 1} index={i} />)}
+            {node.children.map((child, i) => <Row key={child.id} node={child} open={open} toggle={toggle} query={query} depth={depth + 1} index={i} onView={onView} />)}
           </motion.ul>
         )}
       </AnimatePresence>
@@ -158,7 +173,7 @@ function Row({ node, open, toggle, query, flatPath, depth = 0, index = 0 }: {
  * Pestaña Contenido. Cada tipo de recurso tiene su color e icono (y los archivos, su formato). Con búsqueda o un filtro de tipo la
  * vista pasa a una lista plana con la ruta de carpetas; sin ellos es el árbol de carpetas, que conserva lo abierto al cambiar de pestaña.
  */
-export function CourseContent({ items, open, onOpenChange }: { items: ContentItem[]; open: Set<string>; onOpenChange: (open: Set<string>) => void }) {
+export function CourseContent({ items, open, onOpenChange, onView }: { items: ContentItem[]; open: Set<string>; onOpenChange: (open: Set<string>) => void; onView: (item: ContentItem) => void }) {
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
   const [sort, setSort] = useState<Sort>('original');
@@ -219,7 +234,7 @@ export function CourseContent({ items, open, onOpenChange }: { items: ContentIte
           <p className={styles.count} aria-live="polite">{results.length === 0 ? 'Sin coincidencias.' : `${results.length} ${results.length === 1 ? 'recurso' : 'recursos'}`}{sort === 'due' ? ' con fecha de entrega' : ''}<button type="button" className={styles.reset} onClick={() => { setQuery(''); setFilter('all'); setFormat('all'); setSort('original'); }}>Quitar filtros</button></p>
           <ul className={styles.tree}>
             <AnimatePresence mode="popLayout">
-              {results.slice(0, 200).map((item, i) => <Row key={item.id} node={{ ...item, children: [] }} open={open} toggle={toggle} query={query} flatPath={pathOf(item)} index={i} />)}
+              {results.slice(0, 200).map((item, i) => <Row key={item.id} node={{ ...item, children: [] }} open={open} toggle={toggle} query={query} flatPath={pathOf(item)} index={i} onView={onView} />)}
             </AnimatePresence>
           </ul>
           {results.length > 200 && <p className={styles.count}>Mostrando los primeros 200; afina la búsqueda para ver el resto.</p>}
@@ -230,7 +245,7 @@ export function CourseContent({ items, open, onOpenChange }: { items: ContentIte
             <button type="button" onClick={() => onOpenChange(new Set(folderIds))} disabled={folderIds.length > 150 || folderIds.length === 0}>Expandir todo</button>
             <button type="button" onClick={() => onOpenChange(new Set())} disabled={open.size === 0}>Contraer todo</button>
           </div>
-          <ul className={styles.tree}>{roots.map((node, i) => <Row key={node.id} node={node} open={open} toggle={toggle} query="" index={i} />)}</ul>
+          <ul className={styles.tree}>{roots.map((node, i) => <Row key={node.id} node={node} open={open} toggle={toggle} query="" index={i} onView={onView} />)}</ul>
         </>
       )}
     </div>

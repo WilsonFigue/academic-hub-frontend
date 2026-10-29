@@ -6,6 +6,7 @@ import { keys, useSession } from './api/hooks';
 import { AppShell } from './components/AppShell';
 import { ActivitiesPage } from './pages/ActivitiesPage';
 import { ChangePasswordPage } from './pages/ChangePasswordPage';
+import { FilePage } from './pages/FilePage';
 import { CourseDetailPage } from './pages/CourseDetailPage';
 import { CoursesPage } from './pages/CoursesPage';
 import { DashboardPage } from './pages/DashboardPage';
@@ -61,6 +62,7 @@ export function App() {
             <Route path="/change-password" element={<ChangePasswordPage />} />
           </Route>
           <Route element={<RequireAuth />}>
+            <Route path="/courses/:courseId/files/:contentId" element={<FilePage />} />
             <Route element={<ShellLayout />}>
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/courses" element={<CoursesPage />} />
