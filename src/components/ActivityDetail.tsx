@@ -11,6 +11,7 @@ import { activityKind, categoryLabel, courseTitle, formatDateTime, formatDueRela
 import { activityStatus } from '../lib/status';
 import { tintFor } from '../lib/tint';
 import { Badge, Skeleton } from './ui';
+import { StudyGuideBlock } from './StudyGuide';
 import { FileViewer, fileLook, formatBytes, type ViewerTarget } from './FileViewer';
 import styles from './ActivityDetail.module.css';
 
@@ -155,6 +156,12 @@ export function ActivityDetail({ activityId, onClose }: { activityId: string | n
                       {contentLink && (
                         <a className={styles.link} href={contentLink} target="_blank" rel="noopener noreferrer"><ExternalLink size={14} aria-hidden="true" />Abrir enlace del material<span className="visually-hidden"> (se abre en otra pestaña)</span></a>
                       )}
+                    </motion.section>
+                  )}
+
+                  {!activity.isCalculated && (
+                    <motion.section aria-label="Guía de estudio con IA" {...rise(4)}>
+                      <StudyGuideBlock activityId={activity.id} />
                     </motion.section>
                   )}
 

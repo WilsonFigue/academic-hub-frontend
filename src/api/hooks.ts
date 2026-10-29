@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError, api } from './client';
 import type {
-  Activity, ActivityGuide, Attempt, ContentPreview, CalendarItem, Change, ContentItem, Course, Dashboard, EvaluationCycles, EvaluationOverviewTerm, PublicUser, SaveCyclesInput, SessionResponse, Term, UniversityAccount,
+  Activity, ActivityGuide, Attempt, ContentPreview, CalendarItem, Change, ContentItem, Course, Dashboard, EvaluationCycles, EvaluationOverviewTerm, StudyGuideCourse, StudyGuideState, PublicUser, SaveCyclesInput, SessionResponse, Term, UniversityAccount,
 } from './types';
 
 export const keys = {
@@ -162,5 +162,42 @@ export function useSetReviewed(courseId: string, contentId: string) {
       void client.invalidateQueries({ queryKey: ['content-preview', contentId] });
       void client.invalidateQueries({ queryKey: keys.courseContent(courseId) });
     },
+  });
+}
+
+/** Guías de estudio con IA: ajuste por materia (apagado por defecto) y estado de la guía de cada actividad. */
+export const useStudyGuideSettings = () =>
+  useQuery({ queryKey: ['study-guide-settings'], queryFn: () => api<{ courses: StudyGuideCourse[] }>('/study-guides/settings') });
+
+export function useSetStudyGuide() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { courseId: string; enabled: boolean }) =>
+      api<{ courseId: string; enabled: boolean }>(`/courses/${input.courseId}/study-guides/setting`, { method: 'PUT', body: { enabled: input.enabled } }),
+    // Se refleja al instante y se corrige si el servidor rechaza el cambio.
+    onMutate: async (input) => {
+      await client.cancelQueries({ queryKey: ['study-guide-settings'] });
+      const previous = client.getQueryData<{ courses: StudyGuideCourse[] }>(['study-guide-settings']);
+      if (previous) client.setQueryData(['study-guide-settings'], { courses: previous.courses.map((c) => (c.courseId === input.courseId ? { ...c, enabled: input.enabled } : c)) });
+      return { previous };
+    },
+    onError: (_error, _input, context) => { if (context?.previous) client.setQueryData(['study-guide-settings'], context.previous); },
+    onSettled: () => { void client.invalidateQueries({ queryKey: ['study-guide-settings'] }); void client.invalidateQueries({ queryKey: ['study-guide'] }); },
+  });
+}
+
+export const useStudyGuide = (activityId: string) =>
+  useQuery({
+    queryKey: ['study-guide', activityId],
+    queryFn: () => api<StudyGuideState>(`/activities/${activityId}/study-guide`),
+    // Mientras la guía está en cola o generándose, la pantalla consulta su estado.
+    refetchInterval: (query) => { const status = query.state.data?.guide?.status; return status === 'requested' || status === 'generating' ? 8000 : false; },
+  });
+
+export function useRequestStudyGuide(activityId: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: () => api<{ guide: unknown; queued: boolean }>(`/activities/${activityId}/study-guide`, { method: 'POST' }),
+    onSettled: () => { void client.invalidateQueries({ queryKey: ['study-guide', activityId] }); void client.invalidateQueries({ queryKey: ['study-guide-settings'] }); },
   });
 }

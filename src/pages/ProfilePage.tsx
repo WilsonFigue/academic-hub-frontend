@@ -1,11 +1,12 @@
 import {
-  ArrowUpRight, BookOpen, Building2, CalendarDays, Check, CheckCircle2, ClipboardList, Clock, Copy, GraduationCap, KeyRound, Link2, Lock, Mail, RefreshCw, ShieldCheck, TriangleAlert, UserRound, type LucideIcon,
+  ArrowUpRight, BookOpen, Building2, CalendarDays, Check, CheckCircle2, ClipboardList, Clock, Copy, GraduationCap, KeyRound, Link2, Lock, Mail, RefreshCw, ShieldCheck, Sparkles, TriangleAlert, UserRound, type LucideIcon,
 } from 'lucide-react';
 import { animate, motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useDashboard, useMe, useTerms } from '../api/hooks';
 import { ChangePasswordModal } from '../components/ChangePasswordModal';
+import { StudyGuideSettings } from '../components/StudyGuide';
 import { Badge, Button, Card, EmptyState, Skeleton } from '../components/ui';
 import { formatDate, formatDateTime, formatRelative } from '../lib/format';
 import { useReducedMotion } from '../lib/motion';
@@ -183,6 +184,14 @@ export function ProfilePage() {
                 </motion.li>
               ))}
             </ul>
+          </motion.section>
+
+          <motion.section className={styles.panel} aria-labelledby="guides-ai-title" initial={reduce ? false : { opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.33, ease }}>
+            <header className={styles.cardHead}>
+              <span className={cx(styles.cardIcon, styles.cardIconMint)}><Sparkles size={21} aria-hidden="true" /></span>
+              <div><h2 id="guides-ai-title" className={styles.cardTitle}>Guías de estudio con IA</h2><p className={styles.cardSub}>Elige en qué materias se generan solas</p></div>
+            </header>
+            <StudyGuideSettings />
           </motion.section>
 
           <motion.section className={styles.panel} aria-labelledby="sync-title" initial={reduce ? false : { opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.36, ease }}>

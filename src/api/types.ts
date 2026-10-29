@@ -277,3 +277,15 @@ export interface CourseSignals {
   unreadGrades: number | null; announcementsUnread: number | null; announcementsPosted: number | null;
   conversationsTotal: number | null; conversationsUnread: number | null; forumUnread: number | null; contentWithNews: number | null; capturedAt: string;
 }
+
+export interface StudyGuideContent {
+  summary: string;
+  sections: Array<{ heading: string; body: string; bullets?: string[] }>;
+  sources: Array<{ file: string; note?: string }>;
+}
+export interface StudyGuide {
+  id: string; status: 'requested' | 'generating' | 'ready' | 'failed'; trigger: 'manual' | 'routine';
+  content: StudyGuideContent | null; model: string | null; errorCode: string | null; requestedAt: string; finishedAt: string | null;
+}
+export interface StudyGuideState { activityId: string; courseEnabled: boolean; guide: StudyGuide | null; canRequest: boolean }
+export interface StudyGuideCourse { courseId: string; name: string; termName: string | null; enabled: boolean; ready: number; queued: number }
