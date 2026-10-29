@@ -68,3 +68,7 @@
 .menuCompact:hover::after, .menuCompact:focus-visible::after { opacity: 1; transform: translate(-50%, 0); }
 .menuDot { position: absolute; top: -3px; right: -3px; width: 14px; height: 14px; border-radius: 50%; background: var(--s); box-shadow: 0 0 0 3px var(--bg, var(--surface)); }
 .menuBadge { position: absolute; top: -9px; right: -9px; min-width: 22px; padding: 0 6px; border-radius: var(--radius-pill); background: var(--s); color: var(--inverse); font-size: 11px; font-weight: 800; line-height: 20px; text-align: center; box-shadow: 0 0 0 3px var(--bg, var(--surface)); }
+
+/* Globo alineado al borde derecho: evita que se salga de la pantalla cuando el botón queda al final de la fila */
+.menuTipEnd::after { left: auto; right: 0; transform: translate(0, 6px) scale(0.92); transform-origin: right bottom; }
+.menuTipEnd:hover::after, .menuTipEnd:focus-visible::after { transform: translate(0, 0); }

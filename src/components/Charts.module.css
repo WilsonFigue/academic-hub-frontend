@@ -218,3 +218,22 @@
   .donutWrap { gap: 14px; }
   .donutCenter strong { font-size: 30px; }
 }
+
+/* ── Notas por evaluación: filas con barra ── */
+.bars { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.barRow { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 8px 16px; width: 100%; padding: 10px 14px 12px; border: 0; border-radius: 20px; background: transparent; color: var(--text); text-align: left; transition: background-color var(--t-base) var(--ease-out), box-shadow 320ms var(--ease-out); }
+.barRow:enabled:hover { background: color-mix(in srgb, var(--bar) 8%, var(--surface)); box-shadow: 0 10px 22px color-mix(in srgb, var(--bar) 14%, transparent); }
+.barRow:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.barRow:disabled { cursor: default; }
+.barName { min-width: 0; font-size: 14.5px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.3; overflow-wrap: anywhere; }
+.barVal { display: flex; align-items: baseline; gap: 8px; white-space: nowrap; }
+.barVal strong { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; color: var(--b); }
+.barVal small { font-size: 12px; font-weight: 700; color: var(--muted); }
+.barTrack { position: relative; grid-column: 1 / -1; height: 12px; border-radius: 12px; background: color-mix(in srgb, var(--text) 8%, transparent); }
+.barTrack i { display: block; height: 100%; border-radius: 12px; background: linear-gradient(90deg, color-mix(in srgb, var(--bar) 70%, #fff), var(--bar)); transform-origin: left; transition: filter var(--t-base) var(--ease-out); }
+.barRow:enabled:hover .barTrack i { filter: saturate(1.25) brightness(1.04); }
+.barTrack::after { content: ''; position: absolute; top: -4px; bottom: -4px; left: var(--th, 60%); width: 0; border-left: 2px dashed color-mix(in srgb, var(--bad) 70%, transparent); pointer-events: none; }
+
+/* ── Tendencia ── */
+.trend { flex: 1; width: 100%; min-width: 0; min-height: calc(250px * var(--chart-scale, 1)); }
+.trend :global(.recharts-surface) { overflow: visible; }

@@ -40,8 +40,8 @@ export function SegTabs<T extends string>({ label, value, options, onChange, ico
  * Menú de filtro u orden: un botón con su icono que muestra la opción elegida y despliega la lista con iconos, colores y contadores.
  * `neutral` es el valor que equivale a "sin filtro": con otro valor el botón se pinta como activo.
  */
-export function FilterMenu<T extends string>({ label, icon: Icon, value, options, onChange, neutral, compact = false }: {
-  label: string; icon: LucideIcon; value: T; options: Array<KitOption<T>>; onChange: (value: T) => void; neutral?: T; compact?: boolean;
+export function FilterMenu<T extends string>({ label, icon: Icon, value, options, onChange, neutral, compact = false, tipEnd = false }: {
+  label: string; icon: LucideIcon; value: T; options: Array<KitOption<T>>; onChange: (value: T) => void; neutral?: T; compact?: boolean; tipEnd?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const list = useRef<HTMLDivElement>(null);
@@ -58,7 +58,7 @@ export function FilterMenu<T extends string>({ label, icon: Icon, value, options
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger asChild>
-        <button type="button" className={cx(styles.menuBtn, compact && styles.menuCompact, active && styles.menuActive, open && styles.menuOpen)} style={{ ['--s' as string]: current?.color ?? 'var(--accent)' }} aria-label={`${label}: ${current?.label ?? ''}`} data-tip={compact && !open ? `${label}: ${current?.label ?? ''}` : undefined}>
+        <button type="button" className={cx(styles.menuBtn, compact && styles.menuCompact, compact && tipEnd && styles.menuTipEnd, active && styles.menuActive, open && styles.menuOpen)} style={{ ['--s' as string]: current?.color ?? 'var(--accent)' }} aria-label={`${label}: ${current?.label ?? ''}`} data-tip={compact && !open ? `${label}: ${current?.label ?? ''}` : undefined}>
           <Icon size={compact ? 20 : 17} aria-hidden="true" />
           {!compact && <span className={styles.menuText}><small>{label}</small>{current?.label}</span>}
           {!compact && <ChevronDown size={16} className={styles.menuChev} aria-hidden="true" />}

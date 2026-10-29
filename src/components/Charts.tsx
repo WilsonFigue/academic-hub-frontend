@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Area, AreaChart, Bar, BarChart, Cell, LabelList, Legend, ReferenceArea, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { LOW_THRESHOLD } from '../lib/dashFilters';
 import { cssColor } from '../lib/colors';
+import { TIMEZONE } from '../lib/format';
 import styles from './Charts.module.css';
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -218,26 +219,30 @@ export function GradesColumns({ data, onSelect, fill, band = null }: { data: Gra
   );
 }
 
-/** Notas como barras horizontales de porcentaje; color por banda (rojo < 60, ámbar < 80, verde). */
+/**
+ * Notas como filas de porcentaje: nombre y nota arriba, barra con su relleno animado debajo y una marca en el umbral
+ * (60 %). La barra usa el color de la materia; el porcentaje, el de su banda (rojo < 60, ámbar < 80, verde).
+ */
 export function ScoresChart({ data, color, onSelect, threshold = LOW_THRESHOLD }: {
   data: Array<{ id?: string; name: string; pct: number; score: string; max: string; course?: string }>; color?: string; onSelect?: (id: string) => void; threshold?: number;
 }) {
+  const reduce = useReducedMotion();
   return (
-    <div className={styles.chart} style={{ height: Math.max(110, data.length * 38 + 24) }}>
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} layout="vertical" margin={{ top: 0, right: 56, bottom: 0, left: 0 }} barCategoryGap="32%">
-          <XAxis type="number" domain={[0, 100]} hide />
-          <YAxis type="category" dataKey="name" width={170} tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: cssColor('--text') }} interval={0} />
-          <Tooltip {...TIP} formatter={(_v, _n, item) => [`${item.payload.score} / ${item.payload.max} (${Math.round(item.payload.pct)} %)${item.payload.course ? ` · ${item.payload.course}` : ''}`, 'Nota']} />
-          {threshold > 0 && <ReferenceLine x={threshold} stroke={cssColor('--bad')} strokeDasharray="4 4" label={{ value: `${threshold} %`, position: 'top', fontSize: 10, fill: cssColor('--bad') }} />}
-          <Bar dataKey="pct" radius={8} background={{ fill: cssColor('--panel-row'), radius: 8 }} isAnimationActive animationDuration={700}
-            cursor={onSelect ? 'pointer' : undefined} onClick={(entry) => { const p = entry as { id?: string; payload?: { id?: string } }; const id = p.id ?? p.payload?.id; if (onSelect && id) onSelect(id); }}
-            label={{ position: 'right', fontSize: 12, fontWeight: 700, fill: cssColor('--text'), formatter: (value: unknown) => `${Math.round(Number(value))} %` }}>
-            {data.map((entry) => <Cell key={entry.id ?? entry.name} fill={color ?? bandColor(entry.pct)} />)}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
-    </div>
+    <ul className={styles.bars} style={{ ['--th' as string]: `${threshold}%` }}>
+      {data.map((d, i) => (
+        <motion.li key={d.id ?? d.name} initial={reduce ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.15 + i * 0.06, ease }}>
+          <button type="button" className={styles.barRow} disabled={!onSelect || !d.id} onClick={() => d.id && onSelect?.(d.id)}
+            style={{ ['--bar' as string]: color ?? bandColor(d.pct), ['--b' as string]: `var(--${bandOf(d.pct)})` }}
+            aria-label={`${d.name}: ${d.score} de ${d.max}, ${Math.round(d.pct)} por ciento`}>
+            <span className={styles.barName}>{d.name}</span>
+            <span className={styles.barVal}><strong className="tabular">{Math.round(d.pct)}%</strong><small className="tabular">{d.score} / {d.max}</small></span>
+            <span className={styles.barTrack} aria-hidden="true">
+              <motion.i initial={reduce ? false : { scaleX: 0 }} animate={{ scaleX: Math.max(d.pct, 2) / 100 }} transition={{ duration: 0.9, delay: 0.25 + i * 0.06, ease }} />
+            </span>
+          </button>
+        </motion.li>
+      ))}
+    </ul>
   );
 }
 
@@ -265,19 +270,38 @@ export function CourseStatusChart({ data }: { data: Array<{ name: string; graded
   );
 }
 
-/** Tendencia de notas en el tiempo. */
-export function TrendChart({ data, color }: { data: Array<{ date: string; label: string; pct: number; name: string }>; color: string }) {
-  const id = `trend-${color.replace('#', '')}`;
+const trendDay = new Intl.DateTimeFormat('es-SV', { timeZone: TIMEZONE, day: 'numeric', month: 'short' });
+
+function TrendTip({ active, payload }: { active?: boolean; payload?: ReadonlyArray<{ payload?: { date: string; pct: number; name: string } }> }) {
+  const p = payload?.[0]?.payload;
+  if (!active || !p) return null;
   return (
-    <div className={styles.chart} style={{ height: 180 }}>
+    <div className={styles.tip}>
+      <strong>{p.name}</strong>
+      <span className={styles.tipCourse}>{trendDay.format(new Date(p.date)).replace('.', '')}</span>
+      <span className={styles.tipScore} style={{ color: bandColor(p.pct) }}>{Math.round(p.pct)} % · {bandLabel(p.pct)}</span>
+    </div>
+  );
+}
+
+/** Tendencia de notas en el tiempo: curva con área, zona bajo el umbral y un punto por nota con el color de su banda. */
+export function TrendChart({ data, color }: { data: Array<{ date: string; label: string; pct: number; name: string }>; color: string }) {
+  const id = `trend-${color.replace(/[^a-z0-9]/gi, '')}`;
+  const bad = cssColor('--bad');
+  return (
+    <div className={styles.trend}>
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 10, right: 10, bottom: 0, left: -20 }}>
-          <defs><linearGradient id={id} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={color} stopOpacity={0.45} /><stop offset="100%" stopColor={color} stopOpacity={0.02} /></linearGradient></defs>
-          <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: cssColor('--muted') }} interval="preserveStartEnd" />
-          <YAxis domain={[0, 100]} tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: cssColor('--faint') }} width={36} tickFormatter={(v) => `${v}%`} />
-          <ReferenceLine y={LOW_THRESHOLD} stroke={cssColor('--bad')} strokeDasharray="4 4" />
-          <Tooltip {...TIP} formatter={(value, _n, item) => [`${Math.round(Number(value))} % · ${item.payload.name}`, '']} labelFormatter={(label) => `${label}`} />
-          <Area type="monotone" dataKey="pct" stroke={color} strokeWidth={3} fill={`url(#${id})`} dot={{ r: 4, fill: color, strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} isAnimationActive animationDuration={900} />
+        <AreaChart data={data} margin={{ top: 14, right: 18, bottom: 4, left: 4 }}>
+          <defs><linearGradient id={id} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={color} stopOpacity={0.38} /><stop offset="100%" stopColor={color} stopOpacity={0.02} /></linearGradient></defs>
+          <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={10} minTickGap={34} interval="preserveStartEnd" padding={{ left: 18, right: 18 }}
+            tickFormatter={(value: string) => trendDay.format(new Date(value)).replace('.', '')} tick={{ fontSize: 12, fill: cssColor('--muted') }} />
+          <YAxis domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} tickLine={false} axisLine={false} tickMargin={6} width={46} tick={{ fontSize: 11.5, fill: cssColor('--faint') }} tickFormatter={(v) => `${v}%`} />
+          <ReferenceArea y1={0} y2={LOW_THRESHOLD} fill={bad} fillOpacity={0.05} />
+          <ReferenceLine y={LOW_THRESHOLD} stroke={bad} strokeDasharray="5 5" strokeOpacity={0.75} label={{ value: `${LOW_THRESHOLD} %`, position: 'insideBottomRight', fontSize: 11, fontWeight: 800, fill: bad }} />
+          <Tooltip content={<TrendTip />} cursor={{ stroke: color, strokeOpacity: 0.35, strokeDasharray: '3 4' }} />
+          <Area type="monotone" dataKey="pct" stroke={color} strokeWidth={3.5} fill={`url(#${id})`} isAnimationActive animationDuration={1000}
+            dot={(p: { cx?: number; cy?: number; payload?: { pct: number }; index?: number }) => <circle key={p.index} cx={p.cx} cy={p.cy} r={5.5} fill={bandColor(p.payload?.pct ?? 0)} stroke="#fff" strokeWidth={2.5} />}
+            activeDot={{ r: 8, stroke: '#fff', strokeWidth: 3 }} />
         </AreaChart>
       </ResponsiveContainer>
     </div>
