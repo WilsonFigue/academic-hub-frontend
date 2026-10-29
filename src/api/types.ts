@@ -241,6 +241,12 @@ export interface EvaluationCycle {
   isActive: boolean;
   source: string;
   confirmedAt: string | null;
+  /** Fechas oficiales de la evaluación (calendario institucional); null si el ciclo no tiene calendario cargado. */
+  examStart: string | null;
+  examEnd: string | null;
+  deferredStart: string | null;
+  deferredEnd: string | null;
+  gradesCorrectionDeadline: string | null;
 }
 
 export interface EvaluationCycles {
@@ -251,4 +257,16 @@ export interface EvaluationCycles {
 export interface SaveCyclesInput {
   activeNumber: number | null;
   cycles: Array<{ number: number; label: string | null; weightPercent: number | null; items: Array<{ activityId: string; weightWithinCycle: number | null }> }>;
+}
+
+export interface OverviewEvaluation { number: number; examStart: string; examEnd: string; deferredStart: string | null; deferredEnd: string | null; status: 'closed' | 'current' | 'upcoming' }
+export interface OverviewCourseEvaluation { number: number; total: number; graded: number; percent: number | null; points: number | null }
+export interface OverviewCourse {
+  courseId: string; name: string; evaluations: OverviewCourseEvaluation[];
+  pointsEarned: number; pointsAvailable: number; missingToPass: number; reachable: boolean;
+}
+export interface EvaluationOverviewTerm {
+  term: { name: string; passingGrade: number; evaluationWeightPercent: number; classesStart: string | null; classesEnd: string | null; today: string; currentEvaluation: number | null };
+  evaluations: OverviewEvaluation[];
+  courses: OverviewCourse[];
 }

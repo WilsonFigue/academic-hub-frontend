@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError, api } from './client';
 import type {
-  Activity, ActivityGuide, Attempt, ContentPreview, CalendarItem, Change, ContentItem, Course, Dashboard, EvaluationCycles, PublicUser, SaveCyclesInput, SessionResponse, Term, UniversityAccount,
+  Activity, ActivityGuide, Attempt, ContentPreview, CalendarItem, Change, ContentItem, Course, Dashboard, EvaluationCycles, EvaluationOverviewTerm, PublicUser, SaveCyclesInput, SessionResponse, Term, UniversityAccount,
 } from './types';
 
 export const keys = {
@@ -101,6 +101,9 @@ export const useChanges = () =>
     queryFn: ({ pageParam }) => api<{ changes: Change[]; nextCursor: string | null }>(`/changes?limit=30${pageParam ? `&before=${encodeURIComponent(pageParam)}` : ''}`),
     getNextPageParam: (last) => last.nextCursor,
   });
+
+export const useEvaluationOverview = () =>
+  useQuery({ queryKey: ['evaluation-overview'], queryFn: () => api<{ terms: EvaluationOverviewTerm[] }>('/evaluation-overview') });
 
 export const useCycles = (courseId: string) =>
   useQuery({ queryKey: ['cycles', courseId], queryFn: () => api<EvaluationCycles>(`/courses/${courseId}/evaluation-cycles`) });

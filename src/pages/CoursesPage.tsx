@@ -4,6 +4,7 @@ import { useReducedMotion } from '../lib/motion';
 import { useCourses } from '../api/hooks';
 import type { Course } from '../api/types';
 import { CourseCard } from '../components/CourseCard';
+import { TermProgress } from '../components/TermProgress';
 import { Button, Card, EmptyState, Skeleton } from '../components/ui';
 import { courseTitle, formatDate } from '../lib/format';
 import { tintFor } from '../lib/tint';
@@ -34,6 +35,8 @@ export function CoursesPage() {
       {error && <Card><EmptyState tone="danger" icon={<TriangleAlert />} title="No pudimos cargar tus materias"
         action={<Button variant="secondary" onClick={() => refetch()}>Reintentar</Button>}>{error.message}</EmptyState></Card>}
       {data && all.length === 0 && <Card><EmptyState icon={<GraduationCap />} title="Aún no hay materias">Tus materias aparecerán cuando se importen tus inscripciones.</EmptyState></Card>}
+
+      <TermProgress />
 
       <div className={page.stack}>
         {[...groups.entries()].map(([key, group]) => (
