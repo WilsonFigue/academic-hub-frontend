@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowUpRight, BarChart3, CalendarClock, CalendarOff, CircleCheck, Clock, FolderOpen, Info, ListChecks, RefreshCw, Send, TriangleAlert, type LucideIcon } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, BarChart3, CalendarClock, CalendarOff, CircleCheck, Clock, FolderOpen, GraduationCap, Info, ListChecks, Megaphone, MessageSquare, MessagesSquare, RefreshCw, Send, TriangleAlert, type LucideIcon } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
@@ -110,6 +110,14 @@ export function CourseHero({ course, activities, contentCount, status, onStatus,
                   <FolderOpen size={15} aria-hidden="true" /><span>Contenido</span><strong className="tabular">{contentCount}</strong><ArrowUpRight size={14} aria-hidden="true" />
                 </motion.button>
               )}
+              {blackboardNews(course).map((news, index) => (
+                <motion.a key={news.label} className={styles.stat} href={course.lmsUrl ?? undefined} target="_blank" rel="noopener noreferrer"
+                  title={`${news.count} ${news.label.toLowerCase()} sin ver en Blackboard`}
+                  initial={reduce ? false : { opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: 0.88 + index * 0.06, ease }}>
+                  <news.icon size={15} aria-hidden="true" /><span>{news.label}</span><strong className="tabular">{news.count}</strong><ArrowUpRight size={14} aria-hidden="true" />
+                  <span className="visually-hidden"> (se abre en otra pestaña)</span>
+                </motion.a>
+              ))}
             </div>
           </div>
         )}
@@ -134,4 +142,16 @@ export function CourseSections({ tab, tabs, onChange }: { tab: CourseTab; tabs: 
       })}
     </div>
   );
+}
+
+/** Lo que Blackboard dice que el estudiante no ha visto en la materia (solo contadores capturados en la última actualización). */
+function blackboardNews(course: Course): Array<{ label: string; count: number; icon: LucideIcon }> {
+  const signals = course.signals;
+  if (!signals) return [];
+  return [
+    { label: 'Notas nuevas', count: signals.unreadGrades ?? 0, icon: GraduationCap },
+    { label: 'Mensajes', count: signals.conversationsUnread ?? 0, icon: MessageSquare },
+    { label: 'Foros', count: signals.forumUnread ?? 0, icon: MessagesSquare },
+    { label: 'Anuncios', count: signals.announcementsUnread ?? 0, icon: Megaphone },
+  ].filter((item) => item.count > 0);
 }

@@ -156,3 +156,6 @@
 @media (max-width: 390px) {
   .tag { padding: 0 10px 0 9px; font-size: 12.5px; }
 }
+
+a.stat { text-decoration: none; }
+a.stat:hover { text-decoration: none; }

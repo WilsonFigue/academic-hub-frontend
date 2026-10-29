@@ -56,6 +56,8 @@ export interface Course {
   isClosed: boolean | null;
   lmsUrl: string | null;
   lastSeenAt: string;
+  /** Lo que Blackboard dice que no has visto (solo contadores); null si aún no se ha capturado. */
+  signals: CourseSignals | null;
   term: { id: string; name: string; startAt: string | null; endAt: string | null } | null;
   enrollment: { id: string; role: string | null; isAvailable: boolean | null; enrolledAt: string | null; lastAccessAt: string | null };
   activityCount: number;
@@ -269,4 +271,9 @@ export interface EvaluationOverviewTerm {
   term: { name: string; passingGrade: number; evaluationWeightPercent: number; classesStart: string | null; classesEnd: string | null; today: string; currentEvaluation: number | null };
   evaluations: OverviewEvaluation[];
   courses: OverviewCourse[];
+}
+
+export interface CourseSignals {
+  unreadGrades: number | null; announcementsUnread: number | null; announcementsPosted: number | null;
+  conversationsTotal: number | null; conversationsUnread: number | null; forumUnread: number | null; contentWithNews: number | null; capturedAt: string;
 }

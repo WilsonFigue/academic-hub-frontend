@@ -1,7 +1,9 @@
-import { BadgeCheck, CalendarCheck, CalendarRange, Check, Copy, DoorOpen, GraduationCap, Hash, RefreshCw, ScrollText, type LucideIcon } from 'lucide-react';
+import { BadgeCheck, CalendarCheck, CalendarRange, Check, Copy, DoorOpen, GraduationCap, Hash, Megaphone, MessageSquare, MessagesSquare, RefreshCw, ScrollText, type LucideIcon } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useState, type ReactNode } from 'react';
+import { useCycles } from '../api/hooks';
 import type { Course } from '../api/types';
+import { dayRange } from '../lib/evalDates';
 import { courseIcon } from '../lib/courseIcon';
 import { daysUntil, formatDate, formatDateTime, formatRelative } from '../lib/format';
 import { useReducedMotion } from '../lib/motion';
@@ -36,6 +38,60 @@ function Tile({ icon: Icon, label, value, note, color, index, wide }: { icon: Lu
         </span>
       </div>
     </motion.li>
+  );
+}
+
+/** Evaluaciones de la materia con su fecha de examen (calendario oficial de UTEC). */
+function EvaluationStrip({ course }: { course: Course }) {
+  const reduce = useReducedMotion();
+  const { data } = useCycles(course.id);
+  const cycles = (data?.cycles ?? []).filter((cycle) => cycle.examStart && cycle.examEnd);
+  if (cycles.length === 0) return null;
+  const today = new Date().toLocaleDateString('en-CA');
+  return (
+    <motion.section className={styles.evals} aria-label="Evaluaciones del ciclo" initial={reduce ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.14, ease }}>
+      <h3>Evaluaciones del ciclo</h3>
+      <ol>
+        {cycles.map((cycle) => {
+          const status = cycle.isActive ? 'current' : today > cycle.examEnd! ? 'closed' : 'upcoming';
+          return (
+            <li key={cycle.number} data-status={status}>
+              <span className={styles.evalNum}>{status === 'closed' ? <Check size={14} strokeWidth={3.2} aria-hidden="true" /> : cycle.number}</span>
+              <strong>Eval. {cycle.number}</strong>
+              <small>{dayRange(cycle.examStart!, cycle.examEnd!)}</small>
+              <em>{status === 'closed' ? 'Cerrada' : status === 'current' ? 'En curso' : 'Próxima'}</em>
+            </li>
+          );
+        })}
+      </ol>
+    </motion.section>
+  );
+}
+
+/** Lo que Blackboard dice que no has visto (solo contadores de la última actualización). */
+function PendingInBlackboard({ course }: { course: Course }) {
+  const reduce = useReducedMotion();
+  const signals = course.signals;
+  if (!signals) return null;
+  const items: Array<{ icon: LucideIcon; label: string; count: number | null }> = [
+    { icon: GraduationCap, label: 'Notas nuevas', count: signals.unreadGrades },
+    { icon: MessageSquare, label: 'Mensajes sin leer', count: signals.conversationsUnread },
+    { icon: MessagesSquare, label: 'Foros con novedades', count: signals.forumUnread },
+    { icon: Megaphone, label: 'Anuncios sin leer', count: signals.announcementsUnread },
+  ];
+  return (
+    <motion.section className={styles.pending} aria-label="Pendiente en Blackboard" initial={reduce ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2, ease }}>
+      <h3>Pendiente en Blackboard <small>actualizado {formatRelative(signals.capturedAt)}</small></h3>
+      <ul>
+        {items.map(({ icon: Icon, label, count }) => (
+          <li key={label} data-zero={!count}>
+            <span aria-hidden="true"><Icon size={18} /></span>
+            <b className="tabular">{count ?? '–'}</b>
+            <small>{label}</small>
+          </li>
+        ))}
+      </ul>
+    </motion.section>
   );
 }
 
@@ -91,6 +147,9 @@ export function CourseInfo({ course }: { course: Course }) {
           <div className={styles.dates}><span>{formatDate(term.startAt)}</span><span>{formatDate(term.endAt)}</span></div>
         </motion.section>
       )}
+
+      <EvaluationStrip course={course} />
+      <PendingInBlackboard course={course} />
 
       <ul className={styles.tiles}>
         <Tile index={0} icon={CalendarCheck} color="var(--teal)" label="Te inscribiste" value={course.enrollment.enrolledAt ? formatDate(course.enrollment.enrolledAt) : <span className={styles.none}>Blackboard no lo informa</span>} note={course.enrollment.enrolledAt ? formatRelative(course.enrollment.enrolledAt) : undefined} />
