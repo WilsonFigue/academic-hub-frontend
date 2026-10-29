@@ -134,3 +134,9 @@ export function categoryLabel(key: string | null | undefined, title?: string | n
   if (title && !/^[A-Za-z]+\.name$/.test(title)) return title;
   return key || title ? 'Otra categoría' : null;
 }
+
+/** Código corto del ciclo a partir de su nombre: "Ciclo 02-2026" → "C-02". Sin número reconocible devuelve null. */
+export function cycleCode(name: string | null | undefined): string | null {
+  const match = /(\d{1,2})\s*[-–/]\s*\d{4}/.exec(name ?? '') ?? /ciclo\s+(\d{1,2})/i.exec(name ?? '');
+  return match ? `C-${match[1]!.padStart(2, '0')}` : null;
+}

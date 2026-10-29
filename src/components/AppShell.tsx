@@ -9,6 +9,7 @@ import { useDashboard, useLogout, useMe, useSession, useTerms } from '../api/hoo
 import { syncStatus } from '../lib/status';
 import { CommandPalette } from './CommandPalette';
 import { TopBar } from './TopBar';
+import { cycleCode } from '../lib/format';
 import { SideRail } from './SideRail';
 import styles from './AppShell.module.css';
 
@@ -38,6 +39,12 @@ function SheetLink({ item, active, onClick }: { item: Item; active: boolean; onC
       <span>{item.label}</span>
     </NavLink>
   );
+}
+
+function termProgress(term: { startAt: string | null; endAt: string | null } | undefined): number | null {
+  const start = term?.startAt ? Date.parse(term.startAt) : NaN;
+  const end = term?.endAt ? Date.parse(term.endAt) : NaN;
+  return end > start ? Math.min(1, Math.max(0, (Date.now() - start) / (end - start))) : null;
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -81,7 +88,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
       <div className={styles.shell}>
         {/* Menú lateral (≥1101) */}
-        <SideRail groups={railGroups} isActive={isActive} name={user?.displayName ?? user?.username ?? 'Mi cuenta'} initials={initials(user?.displayName, user?.username ?? user?.email ?? 'AH')}
+        <SideRail groups={railGroups} isActive={isActive} name={user?.displayName ?? user?.username ?? 'Mi cuenta'} initials={initials(user?.displayName, user?.username ?? user?.email ?? 'AH')} cycle={cycleCode(term?.name)} cycleName={term?.name} cycleProgress={termProgress(term)}
           profileActive={isActive('/profile')} onLogout={signOut} loggingOut={logout.isPending} />
 
         {/* Barra superior */}

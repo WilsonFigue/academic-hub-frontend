@@ -16,8 +16,10 @@ export type RailItem = { to: string; label: string; icon: LucideIcon; tone: stri
  * como un panel sobre el contenido, con etiquetas, grupos y datos reales (pendientes y novedades). Cada sección tiene su color:
  * la elegida lleva una píldora que se desliza entre secciones. Entra deslizándose y sus piezas llegan escalonadas.
  */
-export function SideRail({ groups, isActive, name, initials, profileActive, onLogout, loggingOut }: {
-  groups: Array<{ label: string; items: RailItem[] }>; isActive: (to: string) => boolean; name: string; initials: string;
+const CYCLE_C = 2 * Math.PI * 21;
+
+export function SideRail({ groups, isActive, name, initials, cycle, cycleName, cycleProgress, profileActive, onLogout, loggingOut }: {
+  groups: Array<{ label: string; items: RailItem[] }>; isActive: (to: string) => boolean; name: string; initials: string; cycle?: string | null; cycleName?: string; cycleProgress?: number | null;
   profileActive: boolean; onLogout: () => void; loggingOut: boolean;
 }) {
   const reduce = useReducedMotion();
@@ -73,6 +75,23 @@ export function SideRail({ groups, isActive, name, initials, profileActive, onLo
             </li>
           ))}
         </ul>
+
+        {cycle && (
+          <motion.div className={styles.cycleBox} title={cycleName} initial={reduce ? false : { opacity: 0, y: 12, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.5, delay: 0.6, ease }}>
+            <span className={styles.cycleTile} aria-hidden="true">
+              <svg viewBox="0 0 48 48">
+                <circle className={styles.cycleTrack} cx="24" cy="24" r="21" />
+                {cycleProgress != null && (
+                  <motion.circle className={styles.cycleArc} cx="24" cy="24" r="21" transform="rotate(-90 24 24)" strokeDasharray={CYCLE_C}
+                    initial={reduce ? false : { strokeDashoffset: CYCLE_C }} animate={{ strokeDashoffset: CYCLE_C * (1 - Math.min(1, Math.max(0, cycleProgress))) }} transition={{ duration: 1.2, delay: 0.8, ease }} />
+                )}
+              </svg>
+              <strong>{cycle}</strong>
+            </span>
+            <span className={styles.label}><strong>Ciclo actual</strong><small>{cycleName}{cycleProgress != null ? ` · ${Math.round(cycleProgress * 100)} %` : ''}</small></span>
+            <span className="visually-hidden">Ciclo actual: {cycleName ?? cycle}</span>
+          </motion.div>
+        )}
 
         <motion.div className={styles.foot} initial={reduce ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.7, ease }}>
           <Link to="/profile" className={cx(styles.me, profileActive && styles.meActive)} aria-label="Mi perfil">
