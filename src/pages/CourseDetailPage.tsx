@@ -15,6 +15,7 @@ import { CourseGrades } from '../components/CourseGrades';
 import { CourseInfo } from '../components/CourseInfo';
 import { CourseHero, CourseSections, type CourseTab } from '../components/CourseHero';
 import { EvaluationCycles } from '../components/EvaluationCycles';
+import { ForumViewer, type ForumTarget } from '../components/ForumViewer';
 import { FileViewer, type ViewerTarget } from '../components/FileViewer';
 import { Card, EmptyState, Skeleton, buttonClass } from '../components/ui';
 import type { DashStatus } from '../lib/dashFilters';
@@ -34,6 +35,7 @@ export function CourseDetailPage() {
   const [status, setStatus] = useState<DashStatus>('all');
   const [selected, setSelected] = useState<Activity | null>(null);
   const [viewing, setViewing] = useState<ViewerTarget | null>(null);
+  const [forum, setForum] = useState<ForumTarget | null>(null);
   // Carpetas abiertas del árbol: se conservan al cambiar de pestaña o abrir un detalle.
   const [openFolders, setOpenFolders] = useState<Set<string>>(new Set());
 
@@ -82,7 +84,7 @@ export function CourseDetailPage() {
 
         {tab === 'content' && (content.isPending ? <Skeleton height={240} radius={22} /> : content.data && content.data.length > 0
           ? <CourseContent items={content.data} open={openFolders} onOpenChange={setOpenFolders}
-            onView={(item) => setViewing({ courseId: id, id: item.id, title: item.title, handler: item.handler, file: item.file, externalUrl: item.externalUrl, lmsUrl: data.lmsUrl })} />
+            onView={(item) => item.handler === 'resource/x-bb-forumlink' ? setForum({ courseId: id, id: item.id, title: item.title }) : setViewing({ courseId: id, id: item.id, title: item.title, handler: item.handler, file: item.file, externalUrl: item.externalUrl, lmsUrl: data.lmsUrl })} />
           : <Card><EmptyState icon={<FolderOpenIcon />} title="Sin contenido visible">No hay contenido disponible para tu inscripción en esta materia.</EmptyState></Card>)}
 
         {tab === 'grades' && (grades.isPending ? <Skeleton height={240} radius={22} /> : graded.length > 0
@@ -96,6 +98,7 @@ export function CourseDetailPage() {
 
       <ActivityDetail activityId={selected?.id ?? null} onClose={() => setSelected(null)} />
       <FileViewer target={viewing} onClose={() => setViewing(null)} />
+      <ForumViewer target={forum} onClose={() => setForum(null)} />
     </div>
   );
 }

@@ -56,7 +56,7 @@ export function statusKeyOf(activity: Activity): StatusKey {
 export function averagePct(activities: Activity[]): number | null {
   let got = 0; let max = 0;
   for (const a of activities) {
-    if (a.isCalculated || a.isExempt) continue;
+    if (a.isCalculated || a.isExempt || a.countsInGrade === false) continue;
     const possible = Number(a.pointsPossible);
     if (!(possible > 0) || (a.score === null && !a.isAutoZero)) continue;
     got += Number(a.score ?? 0); max += possible;

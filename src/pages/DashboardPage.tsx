@@ -120,7 +120,7 @@ export function DashboardPage() {
   const base = useMemo(() => (viewCourse ? all.filter((a) => a.courseId === viewCourse) : all), [all, viewCourse]);
 
   const count = (group: StatusGroup) => base.filter((a) => matchesStatus(a, group as DashStatus)).length;
-  const gradedBase = useMemo(() => base.filter((a) => statusGroup(a) === 'graded' && pctOf(a) !== null && (a.score !== null || a.isAutoZero))
+  const gradedBase = useMemo(() => base.filter((a) => statusGroup(a) === 'graded' && a.countsInGrade !== false && pctOf(a) !== null && (a.score !== null || a.isAutoZero))
     .sort((x, y) => (Date.parse(y.gradedAt ?? y.dueAt ?? '') || 0) - (Date.parse(x.gradedAt ?? x.dueAt ?? '') || 0)), [base]);
   const low = gradedBase.filter((a) => (pctOf(a) ?? 100) < LOW_THRESHOLD).length;
   const gradedShown = viewStatus === 'low' ? gradedBase.filter((a) => (pctOf(a) ?? 100) < LOW_THRESHOLD) : gradedBase;

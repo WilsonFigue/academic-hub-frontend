@@ -89,6 +89,9 @@ export interface Activity {
   isExempt: boolean | null;
   hasFeedback: boolean | null;
   isAutoZero: boolean;
+  /** false = no entra en promedios ni puntos (p. ej. un diferido cuando ya hiciste el ordinario). */
+  countsInGrade?: boolean;
+  gradeNote?: string | null;
   content: { id: string; title: string; handler: string; description: string | null; externalUrl: string | null } | null;
   feedbackText: string | null;
   lmsUrl: string | null;
@@ -303,3 +306,8 @@ export interface Homework {
   costUsd: number | null; requestedAt: string; finishedAt: string | null;
 }
 export interface HomeworkState { activityId: string; courseEnabled: boolean; eligible: boolean; pending: boolean; homework: Homework | null }
+
+/** Foros: sugerencia de respuesta que el estudiante pide con un botón (nada se publica por él). */
+export interface ForumSuggestion { postText: string; replies: Array<{ to: string; full?: string; text: string }>; promptSource: 'teacher_post' | 'pasted' | 'title_only'; model: string | null; costUsd: number | null; updatedAt: string }
+export type ForumState = { isForum: false } | { isForum: true; title: string; dueAt: string | null; graded: boolean; prompt: string | null; promptStatus?: string; availability?: { available: boolean; windows: Array<{ start: string | null; end: string | null }> } | null; canReadLive: boolean; aiConfigured: boolean; suggestion: ForumSuggestion | null };
+export interface ForumSuggestionResponse { suggestion: ForumSuggestion; promptStatus: string; repliesRead: number }

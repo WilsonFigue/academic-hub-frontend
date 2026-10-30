@@ -13,6 +13,7 @@ import { tintFor } from '../lib/tint';
 import { Badge, Skeleton } from './ui';
 import { StudyGuideBlock } from './StudyGuide';
 import { HomeworkBlock } from './Homework';
+import { ForumBlock } from './ForumBlock';
 import { FileViewer, fileLook, formatBytes, type ViewerTarget } from './FileViewer';
 import styles from './ActivityDetail.module.css';
 
@@ -79,6 +80,8 @@ export function ActivityDetail({ activityId, onClose }: { activityId: string | n
   const rise = (i: number) => ({ initial: reduce ? false : { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.4, delay: 0.12 + i * 0.07, ease } });
 
   // Línea de tiempo: vence → entregado → calificado (solo con fechas reales).
+  // Vencida o ya calificada: ya no se puede entregar ni participar, así que no se ofrece guía, sugerencia ni tarea con IA.
+  const finished = Boolean(activity && ((activity.dueAt !== null && Date.parse(activity.dueAt) < Date.now()) || activity.status === 'GRADED'));
   const steps = activity ? [
     { icon: CalendarClock, label: 'Vence', value: activity.dueAt ? formatDateTime(activity.dueAt) : 'Sin fecha', done: activity.dueAt !== null && Date.parse(activity.dueAt) < Date.now() },
     { icon: Send, label: 'Entregado', value: activity.submittedAt ? formatDateTime(activity.submittedAt) : 'Sin registro', done: Boolean(activity.submittedAt) },
@@ -126,7 +129,8 @@ export function ActivityDetail({ activityId, onClose }: { activityId: string | n
                     </div>
                   </motion.section>
 
-                  {activity.isAutoZero && <motion.p className={styles.callout} {...rise(1)}><Info size={16} aria-hidden="true" />Blackboard asignó un cero automático porque la fecha venció sin entrega registrada. No es una calificación del docente y aún puede modificarse.</motion.p>}
+                  {activity.countsInGrade === false && activity.gradeNote && <motion.p className={styles.callout} {...rise(1)}><Info size={16} aria-hidden="true" />No cuenta en tu nota. {activity.gradeNote}</motion.p>}
+                  {activity.isAutoZero && activity.countsInGrade !== false && <motion.p className={styles.callout} {...rise(1)}><Info size={16} aria-hidden="true" />Blackboard asignó un cero automático porque la fecha venció sin entrega registrada. No es una calificación del docente y aún puede modificarse.</motion.p>}
                   {activity.isCalculated && <motion.p className={styles.callout} {...rise(1)}><Info size={16} aria-hidden="true" />Esta columna la calcula Blackboard con una fórmula del docente. No se presenta como nota final oficial.</motion.p>}
                   {!activity.isCalculated && activity.isSubmitted === null && activity.status !== 'GRADED' && activity.dueAt !== null && Date.parse(activity.dueAt) < Date.now() && (
                     <motion.p className={styles.callout} {...rise(1)}><Info size={16} aria-hidden="true" />Blackboard no informó intentos para esta actividad, así que no podemos confirmar si hubo entrega.</motion.p>
@@ -160,13 +164,19 @@ export function ActivityDetail({ activityId, onClose }: { activityId: string | n
                     </motion.section>
                   )}
 
-                  {!activity.isCalculated && (
+                  {!activity.isCalculated && !finished && (
                     <motion.section aria-label="Guía de estudio con IA" {...rise(4)}>
                       <StudyGuideBlock activityId={activity.id} />
                     </motion.section>
                   )}
 
-                  {!activity.isCalculated && (
+                  {activity.content?.handler === 'resource/x-bb-forumlink' && !finished && (
+                    <motion.section aria-label="Sugerencia de respuesta para el foro" {...rise(4)}>
+                      <ForumBlock base={`/activities/${activity.id}`} />
+                    </motion.section>
+                  )}
+
+                  {!activity.isCalculated && !finished && (
                     <motion.section aria-label="Tarea con IA" {...rise(4)}>
                       <HomeworkBlock activityId={activity.id} />
                     </motion.section>

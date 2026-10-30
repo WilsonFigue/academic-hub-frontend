@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError, api } from './client';
 import type {
-  Activity, ActivityGuide, Attempt, ContentPreview, CalendarItem, Change, ContentItem, Course, Dashboard, EvaluationCycles, EvaluationOverviewTerm, StudyGuideCourse, StudyGuideState, HomeworkState, PublicUser, SaveCyclesInput, SessionResponse, Term, UniversityAccount,
+  Activity, ActivityGuide, Attempt, ContentPreview, CalendarItem, Change, ContentItem, Course, Dashboard, EvaluationCycles, EvaluationOverviewTerm, StudyGuideCourse, StudyGuideState, HomeworkState, ForumState, ForumSuggestionResponse, PublicUser, SaveCyclesInput, SessionResponse, Term, UniversityAccount,
 } from './types';
 
 export const keys = {
@@ -223,6 +223,18 @@ export const useHomework = (activityId: string) =>
     retry: false,
     refetchInterval: (query) => { const status = query.state.data?.homework?.status; return status === 'requested' || status === 'generating' ? 10000 : false; },
   });
+
+/** Foro (base = «/activities/:id» o «/courses/:c/content/:i»): lo que ya se sabe y la última sugerencia guardada (no llama a Blackboard). */
+export const useForum = (base: string) => useQuery({ queryKey: ['forum', base], queryFn: () => api<ForumState>(`${base}/forum`), retry: false });
+
+/** Botón «Generar sugerencia de respuesta»: solo corre cuando el estudiante lo pulsa. */
+export function useForumSuggestion(base: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { includeReplies: boolean; prompt?: string }) => api<ForumSuggestionResponse>(`${base}/forum/suggestion`, { method: 'POST', body: input }),
+    onSuccess: () => { void client.invalidateQueries({ queryKey: ['forum', base] }); },
+  });
+}
 
 /** Archivo de una tarea: los PDF se abren en el visor del navegador; los demás se descargan. */
 export const homeworkFileUrl = (activityId: string, name: string) => `/api/v1/activities/${activityId}/homework/files/${encodeURIComponent(name)}`;

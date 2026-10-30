@@ -70,7 +70,7 @@ function look(item: ContentItem) {
 
 const isYouTube = (url: string | null) => /^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\//.test(url ?? '');
 /** Archivos, documentos con texto y videos de YouTube se abren en el visor; el resto, como siempre. */
-const viewable = (item: ContentItem) => Boolean(item.file) || (item.handler === 'resource/x-bb-document' && Boolean(item.bodyText)) || isYouTube(item.externalUrl);
+const viewable = (item: ContentItem) => item.handler === 'resource/x-bb-forumlink' || Boolean(item.file) || (item.handler === 'resource/x-bb-document' && Boolean(item.bodyText)) || isYouTube(item.externalUrl);
 
 type Sort = 'original' | 'new' | 'old' | 'name' | 'due';
 const SORTS = [

@@ -20,7 +20,7 @@ import styles from './Grades.module.css';
 
 const ease = [0.22, 1, 0.36, 1] as const;
 const cx = (...names: Array<string | false | null | undefined>) => names.filter(Boolean).join(' ');
-const isGraded = (a: Activity) => !a.isCalculated && (a.isAutoZero || (a.status === 'GRADED' && a.score !== null));
+const isGraded = (a: Activity) => !a.isCalculated && a.countsInGrade !== false && (a.isAutoZero || (a.status === 'GRADED' && a.score !== null));
 const pctOf = (a: Activity) => (Number(a.pointsPossible) > 0 ? Math.min(100, (Number(a.score) / Number(a.pointsPossible)) * 100) : null);
 const bandVar = (pct: number) => (pct < 60 ? 'var(--bad)' : pct < 80 ? 'var(--warn)' : 'var(--ok)');
 

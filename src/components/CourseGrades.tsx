@@ -85,7 +85,7 @@ export function CourseGrades({ activities, onSelect }: { activities: Activity[];
   const [mode, setMode] = useState<'line' | 'bars'>('line');
 
   const calculated = activities.filter((a) => a.isCalculated && a.score !== null);
-  const rows = useMemo(() => activities.filter((a) => !a.isCalculated && (a.score !== null || a.isAutoZero)), [activities]);
+  const rows = useMemo(() => activities.filter((a) => !a.isCalculated && a.countsInGrade !== false && (a.score !== null || a.isAutoZero)), [activities]);
   const byDate = useMemo(() => rows.slice().sort((a, b) => (a.dueAt ? Date.parse(a.dueAt) : 0) - (b.dueAt ? Date.parse(b.dueAt) : 0)), [rows]);
   const avg = averagePct(rows);
   const counts = { good: 0, mid: 0, low: 0 };
