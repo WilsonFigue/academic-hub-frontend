@@ -309,5 +309,5 @@ export interface HomeworkState { activityId: string; courseEnabled: boolean; eli
 
 /** Foros: sugerencia de respuesta que el estudiante pide con un botón (nada se publica por él). */
 export interface ForumSuggestion { postText: string; replies: Array<{ to: string; full?: string; text: string }>; promptSource: 'teacher_post' | 'pasted' | 'title_only'; model: string | null; costUsd: number | null; updatedAt: string }
-export type ForumState = { isForum: false } | { isForum: true; title: string; dueAt: string | null; graded: boolean; prompt: string | null; promptStatus?: string; availability?: { available: boolean; windows: Array<{ start: string | null; end: string | null }> } | null; canReadLive: boolean; aiConfigured: boolean; suggestion: ForumSuggestion | null };
+export type ForumState = { isForum: false } | { isForum: true; title: string; dueAt: string | null; graded: boolean; participated?: boolean | null; prompt: string | null; promptStatus?: string; availability?: { available: boolean; windows: Array<{ start: string | null; end: string | null }> } | null; canReadLive: boolean; aiConfigured: boolean; suggestion: ForumSuggestion | null };
 export interface ForumSuggestionResponse { suggestion: ForumSuggestion; promptStatus: string; repliesRead: number }

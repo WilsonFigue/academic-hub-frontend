@@ -73,7 +73,8 @@ export function ForumBlock({ base, expanded = false }: { base: string; expanded?
   const now = Date.now();
   const closed = windows.length > 0 && !data.availability?.available && windows.every((w) => w.end && Date.parse(w.end) < now);
   const notOpen = windows.length > 0 && !data.availability?.available && !closed;
-  const locked = closed || notOpen;
+  const done = data.participated === true;
+  const locked = closed || notOpen || done;
   const state = closed ? 'closed' : notOpen ? 'soon' : 'open';
 
   return (
@@ -82,13 +83,19 @@ export function ForumBlock({ base, expanded = false }: { base: string; expanded?
         <div className={styles.head}>
           <span className={styles.icon} aria-hidden="true"><MessagesSquare size={20} /></span>
           <span className={styles.text}>
-            <b>{closed ? 'Foro cerrado' : notOpen ? 'Foro aún no abre' : 'Responder este foro'}</b>
-            <small>{closed ? 'Ya pasó su fecha: ya no se puede participar.' : notOpen ? 'Todavía no está disponible para participar.' : 'La IA te sugiere qué escribir; tú lo revisas y lo publicas.'}</small>
+            <b>{done ? 'Ya participaste' : closed ? 'Foro cerrado' : notOpen ? 'Foro aún no abre' : 'Responder este foro'}</b>
+            <small>{done ? 'Ya hay una respuesta tuya en este foro.' : closed ? 'Ya pasó su fecha: ya no se puede participar.' : notOpen ? 'Todavía no está disponible para participar.' : 'La IA te sugiere qué escribir; tú lo revisas y lo publicas.'}</small>
           </span>
         </div>
       )}
 
-      {windows.length > 0 && (
+      {done && (
+        <Reveal order={0}>
+          <p className={styles.doneBanner} role="status"><Check size={16} strokeWidth={3} aria-hidden="true" />Ya participaste en este foro: no hace falta sugerencia.</p>
+        </Reveal>
+      )}
+
+      {windows.length > 0 && !done && (
         <Reveal order={0} className={styles.when}>
           <span className={styles.pill} data-state={state}><CalendarClock size={14} aria-hidden="true" />{closed ? 'Cerrado' : notOpen ? 'Aún no abre' : 'Abierto'}</span>
           <span className={styles.dates}>{windows.map((w) => `del ${day(w.start) ?? 'siempre'} al ${day(w.end) ?? 'sin fecha final'}`).join(' · ')}</span>
@@ -148,7 +155,7 @@ export function ForumBlock({ base, expanded = false }: { base: string; expanded?
         </div>
       )}
 
-      {suggestion && !suggest.isPending && (
+      {suggestion && !suggest.isPending && !done && (
         <div className={styles.result}>
           <Reveal order={0}>
             <section className={styles.card} aria-label="Sugerencia de la IA para tu participación">
