@@ -1,6 +1,6 @@
-import { ExclamationTriangleIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { useRef, useState, type FormEvent } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { ApiError } from '../api/client';
 import { useLogin, useSession } from '../api/hooks';
 import { Button, TextField } from '../components/ui';
@@ -19,8 +19,6 @@ export function LoginPage() {
   const session = useSession();
   const login = useLogin();
   const navigate = useNavigate();
-  const location = useLocation();
-  const expired = (location.state as { expired?: boolean } | null)?.expired;
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ identifier?: string; password?: string }>({});
@@ -48,11 +46,6 @@ export function LoginPage() {
       <p className={styles.subtitle}>Entra con tu cuenta de Academic Hub.</p>
 
       <form className={styles.form} onSubmit={onSubmit} noValidate>
-        {expired && !login.error && (
-          <div className={`${styles.alert} ${styles.alertInfo}`} role="status">
-            <InformationCircleIcon aria-hidden="true" />Tu sesión expiró. Vuelve a iniciar sesión para continuar.
-          </div>
-        )}
         {login.error && (
           <div className={styles.alert} role="alert">
             <ExclamationTriangleIcon aria-hidden="true" />{loginErrorMessage(login.error)}
