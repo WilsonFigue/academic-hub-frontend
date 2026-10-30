@@ -2,7 +2,7 @@ import { ArrowLeft, CalendarClock, Check, Download, FileText, Loader2, Shapes, S
 import { motion } from 'motion/react';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { guidePdfUrl, useActivity, useStudyGuide } from '../api/hooks';
+import { guideDocxUrl, guidePdfUrl, useActivity, useStudyGuide } from '../api/hooks';
 import type { StudyGuide } from '../api/types';
 import { GeoGebraPanel } from '../components/GeoGebraPanel';
 import { GuidePdfViewer } from '../components/GuidePdfViewer';
@@ -121,6 +121,7 @@ export function StudyGuidePage() {
         <div className={styles.pdfActions}>
           <button type="button" className={styles.print} onClick={() => setPdfOpen(true)}><FileText size={16} aria-hidden="true" />Ver PDF</button>
           <a className={styles.print} href={guidePdfUrl(activityId, true)} download><Download size={16} aria-hidden="true" />Descargar PDF</a>
+          <a className={styles.print} href={guideDocxUrl(activityId)} download><Download size={16} aria-hidden="true" />Descargar Word</a>
         </div>
       </div>
 

@@ -8,6 +8,7 @@ import { ActivitiesPage } from './pages/ActivitiesPage';
 import { ChangePasswordPage } from './pages/ChangePasswordPage';
 import { FilePage } from './pages/FilePage';
 import { StudyGuidePage } from './pages/StudyGuidePage';
+import { HomeworkPage } from './pages/HomeworkPage';
 import { CourseDetailPage } from './pages/CourseDetailPage';
 import { CoursesPage } from './pages/CoursesPage';
 import { DashboardPage } from './pages/DashboardPage';
@@ -70,6 +71,7 @@ export function App() {
               <Route path="/courses/:id" element={<CourseDetailPage />} />
               <Route path="/activities" element={<ActivitiesPage />} />
               <Route path="/activities/:activityId/guide" element={<StudyGuidePage />} />
+              <Route path="/activities/:activityId/homework" element={<HomeworkPage />} />
               <Route path="/calendar" element={<CalendarPage />} />
               <Route path="/grades" element={<GradesPage />} />
               <Route path="/updates" element={<UpdatesPage />} />

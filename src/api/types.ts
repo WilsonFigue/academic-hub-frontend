@@ -56,6 +56,8 @@ export interface Course {
   isClosed: boolean | null;
   lmsUrl: string | null;
   lastSeenAt: string;
+  /** Docente de la materia (nombre completo); null si aún no se ha registrado. */
+  instructorName: string | null;
   /** Lo que Blackboard dice que no has visto (solo contadores); null si aún no se ha capturado. */
   signals: CourseSignals | null;
   term: { id: string; name: string; startAt: string | null; endAt: string | null } | null;
@@ -291,3 +293,13 @@ export interface StudyGuide {
 }
 export interface StudyGuideState { activityId: string; courseEnabled: boolean; guide: StudyGuide | null; canRequest: boolean }
 export interface StudyGuideCourse { courseId: string; name: string; termName: string | null; enabled: boolean; ready: number; queued: number }
+
+/** Tareas resueltas con IA (agente con herramientas). */
+export interface HomeworkDeliverable { name: string; kind: 'pdf' | 'docx' | 'xlsx' | 'ggb'; bytes: number }
+export interface HomeworkReport { turns: number; tools: Record<string, number>; assumptions: string[]; pending: string[]; placeholders: string[]; warnings: string[]; materialDocs: string[] }
+export interface Homework {
+  id: string; status: 'requested' | 'generating' | 'ready' | 'failed' | 'skipped'; trigger: 'manual' | 'routine';
+  deliverables: HomeworkDeliverable[]; summary: string | null; report: HomeworkReport | null; model: string | null; errorCode: string | null;
+  costUsd: number | null; requestedAt: string; finishedAt: string | null;
+}
+export interface HomeworkState { activityId: string; courseEnabled: boolean; eligible: boolean; pending: boolean; homework: Homework | null }

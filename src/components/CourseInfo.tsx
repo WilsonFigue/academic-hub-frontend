@@ -10,6 +10,7 @@ import { useReducedMotion } from '../lib/motion';
 import { tintFor } from '../lib/tint';
 import { normalize } from './Filters';
 import { CourseGuideToggle } from './StudyGuide';
+import { InstructorField } from './InstructorField';
 import styles from './CourseInfo.module.css';
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -149,6 +150,7 @@ export function CourseInfo({ course }: { course: Course }) {
         </motion.section>
       )}
 
+      <InstructorField course={course} />
       <CourseGuideToggle courseId={course.id} />
       <EvaluationStrip course={course} />
       <PendingInBlackboard course={course} />

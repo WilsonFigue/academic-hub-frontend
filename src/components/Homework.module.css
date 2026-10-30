@@ -1,0 +1,10 @@
+/* Apartado «Tarea lista para enviar» dentro de la actividad: una sola fila que abre la vista nueva. */
+.block { --k: var(--ok); display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 22px; background: color-mix(in srgb, var(--k) 9%, var(--panel-row)); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--k) 22%, transparent); color: var(--text); text-decoration: none; transition: transform 320ms var(--ease-out), box-shadow 320ms var(--ease-out), background-color var(--t-base) var(--ease-out); }
+.block:hover { transform: translateY(-2px); background: color-mix(in srgb, var(--k) 14%, var(--panel-row)); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--k) 40%, transparent), 0 10px 22px color-mix(in srgb, var(--k) 20%, transparent); text-decoration: none; }
+.block:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.icon { display: grid; flex: none; place-items: center; width: 44px; height: 44px; border-radius: 16px; background: color-mix(in srgb, var(--k) 18%, var(--surface)); color: var(--k); }
+.text { display: grid; flex: 1; min-width: 0; line-height: 1.35; }
+.text b { font-size: 16px; font-weight: 800; }
+.text small { font-size: 12.5px; color: var(--muted); }
+.go { display: grid; flex: none; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--k); color: #fff; transition: transform 320ms var(--ease-out); }
+.block:hover .go { transform: translate(2px, -2px); }

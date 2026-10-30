@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError, api } from './client';
 import type {
-  Activity, ActivityGuide, Attempt, ContentPreview, CalendarItem, Change, ContentItem, Course, Dashboard, EvaluationCycles, EvaluationOverviewTerm, StudyGuideCourse, StudyGuideState, PublicUser, SaveCyclesInput, SessionResponse, Term, UniversityAccount,
+  Activity, ActivityGuide, Attempt, ContentPreview, CalendarItem, Change, ContentItem, Course, Dashboard, EvaluationCycles, EvaluationOverviewTerm, StudyGuideCourse, StudyGuideState, HomeworkState, PublicUser, SaveCyclesInput, SessionResponse, Term, UniversityAccount,
 } from './types';
 
 export const keys = {
@@ -67,6 +67,14 @@ export function useChangePassword() {
 
 export const useDashboard = () => useQuery({ queryKey: keys.dashboard, queryFn: () => api<Dashboard>('/dashboard') });
 export const useCourses = () => useQuery({ queryKey: keys.courses, queryFn: async () => (await api<{ courses: Course[] }>('/courses')).courses });
+/** Guarda (o borra, con null) el docente de una materia. */
+export function useSetInstructor(courseId: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (name: string | null) => api<{ courseId: string; instructorName: string | null }>(`/courses/${courseId}/instructor`, { method: 'PUT', body: { name } }),
+    onSettled: () => { void client.invalidateQueries({ queryKey: keys.courses }); void client.invalidateQueries({ queryKey: keys.course(courseId) }); },
+  });
+}
 export const useCourse = (id: string) => useQuery({ queryKey: keys.course(id), queryFn: async () => (await api<{ course: Course }>(`/courses/${id}`)).course });
 export const useCourseContent = (id: string) =>
   useQuery({ queryKey: keys.courseContent(id), queryFn: async () => (await api<{ items: ContentItem[] }>(`/courses/${id}/content`)).items });
@@ -203,4 +211,18 @@ export function useRequestStudyGuide(activityId: string) {
 }
 
 /** PDF de la guía de estudio: sin parámetros se abre en el visor; con download se descarga. */
+/** La misma guía en Word. */
+export const guideDocxUrl = (activityId: string) => `/api/v1/activities/${activityId}/study-guide/docx`;
 export const guidePdfUrl = (activityId: string, download = false) => `/api/v1/activities/${activityId}/study-guide/pdf${download ? '?download=1' : ''}`;
+
+/** Tarea con IA de una actividad: estado y archivos. La genera la rutina del servidor; aquí solo se consulta. */
+export const useHomework = (activityId: string) =>
+  useQuery({
+    queryKey: ['homework', activityId],
+    queryFn: () => api<HomeworkState>(`/activities/${activityId}/homework`),
+    retry: false,
+    refetchInterval: (query) => { const status = query.state.data?.homework?.status; return status === 'requested' || status === 'generating' ? 10000 : false; },
+  });
+
+/** Archivo de una tarea: los PDF se abren en el visor del navegador; los demás se descargan. */
+export const homeworkFileUrl = (activityId: string, name: string) => `/api/v1/activities/${activityId}/homework/files/${encodeURIComponent(name)}`;

@@ -12,6 +12,7 @@ import { activityStatus } from '../lib/status';
 import { tintFor } from '../lib/tint';
 import { Badge, Skeleton } from './ui';
 import { StudyGuideBlock } from './StudyGuide';
+import { HomeworkBlock } from './Homework';
 import { FileViewer, fileLook, formatBytes, type ViewerTarget } from './FileViewer';
 import styles from './ActivityDetail.module.css';
 
@@ -162,6 +163,12 @@ export function ActivityDetail({ activityId, onClose }: { activityId: string | n
                   {!activity.isCalculated && (
                     <motion.section aria-label="Guía de estudio con IA" {...rise(4)}>
                       <StudyGuideBlock activityId={activity.id} />
+                    </motion.section>
+                  )}
+
+                  {!activity.isCalculated && (
+                    <motion.section aria-label="Tarea con IA" {...rise(4)}>
+                      <HomeworkBlock activityId={activity.id} />
                     </motion.section>
                   )}
 

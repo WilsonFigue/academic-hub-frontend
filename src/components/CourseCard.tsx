@@ -1,4 +1,4 @@
-import { ArrowUpRight, CalendarClock, ClipboardList } from 'lucide-react';
+import { ArrowUpRight, CalendarClock, ClipboardList, UserRound } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { Course } from '../api/types';
 import { courseIcon } from '../lib/courseIcon';
@@ -29,6 +29,7 @@ export function CourseCard({ course, showShortcuts = false, query = '' }: { cour
           <Link to={`/courses/${course.id}`} className={styles.stretched}><Highlight text={title} query={query} /></Link>
         </h3>
         <p className={styles.code}>{[course.courseCode, course.term?.name].filter(Boolean).join(' · ')}</p>
+        {course.instructorName && <p className={styles.teacher}><UserRound size={13} aria-hidden="true" />{course.instructorName}</p>}
         {unavailable && <p className={styles.unavailable}>No disponible en Blackboard</p>}
         <div className={styles.facts}>
           <span><ClipboardList size={15} aria-hidden="true" /><strong className="tabular">{course.activityCount}</strong> {course.activityCount === 1 ? 'actividad' : 'actividades'}</span>
