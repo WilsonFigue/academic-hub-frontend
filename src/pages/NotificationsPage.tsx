@@ -1,7 +1,7 @@
-import { Bell, BellOff, BellRing, Check, CheckCheck, ChevronDown, Settings2, Trash2 } from 'lucide-react';
+import { Bell, BellOff, BellRing, Check, CheckCheck, ChevronDown, Loader2, Settings2, Trash2 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { useState } from 'react';
-import { useDismissNotifications, useMarkNotificationsRead, useNotificationPreferences, useNotifications, useSetNotificationPreferences } from '../api/hooks';
+import { useEffect, useState, type ReactNode } from 'react';
+import { useDismissNotifications, useMarkNotificationsRead, useNotificationPreferences, useNotifications, useSetNotificationPreferences, useTelegram, useTelegramEnabled, useTelegramLink, useTelegramTest, useTelegramUnlink } from '../api/hooks';
 import type { NotificationKind } from '../api/types';
 import { NotificationItem, useOpenNotification } from '../components/NotificationCenter';
 import { browserAlertsAllowed } from '../components/NotificationToaster';
@@ -13,22 +13,78 @@ import styles from './Notifications.module.css';
 const ease = [0.22, 1, 0.36, 1] as const;
 const cx = (...names: Array<string | false | null | undefined>) => names.filter(Boolean).join(' ');
 
-/** Franja corta junto al título: avisos del sistema cuando la app está en otra pestaña. */
+/** Logo de Telegram: avioncito blanco sobre círculo azul. */
+function TelegramLogo({ size = 44 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+      <defs><linearGradient id="tg-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#37aee2" /><stop offset="1" stopColor="#1e96c8" /></linearGradient></defs>
+      <circle cx="24" cy="24" r="24" fill="url(#tg-grad)" />
+      <path fill="#ffffff" d="M10.6 23.4l19.9-7.7c.9-.4 1.8.2 1.5 1.6l-3.4 16c-.2 1.1-.9 1.4-1.8.9l-5-3.7-2.4 2.3c-.3.3-.5.5-1 .5l.4-5.1 9.3-8.4c.4-.4-.1-.6-.6-.2L16.1 25.2l-5-1.6c-1.1-.3-1.1-1.1.2-1.6z" />
+    </svg>
+  );
+}
+
+type Dot = 'on' | 'off' | 'wait';
+/** Un canal de aviso (Telegram, navegador): icono, nombre, estado con punto de color y sus acciones. */
+function Channel({ icon, title, status, dot, children }: { icon: ReactNode; title: string; status: string; dot: Dot; children?: ReactNode }) {
+  return (
+    <div className={styles.channel}>
+      <span className={styles.channelIcon} aria-hidden="true">{icon}</span>
+      <div className={styles.channelText}>
+        <b>{title}</b>
+        <small><i className={cx(styles.dot, styles[`dot-${dot}`])} aria-hidden="true" />{status}</small>
+      </div>
+      {children && <div className={styles.channelActions}>{children}</div>}
+    </div>
+  );
+}
+
+/** Conectar Telegram: genera el enlace al bot, espera a que la persona pulse «Iniciar» y luego permite probar, pausar o desconectar. */
+function TelegramConnect() {
+  const [waiting, setWaiting] = useState(false);
+  const [note, setNote] = useState('');
+  const { data } = useTelegram(waiting);
+  const link = useTelegramLink();
+  const unlink = useTelegramUnlink();
+  const test = useTelegramTest();
+  const enabled = useTelegramEnabled();
+  useEffect(() => { if (waiting && data?.linked) { setWaiting(false); setNote('¡Conectado! Ya te llegarán los avisos.'); } }, [waiting, data?.linked]);
+  if (!data?.configured) return null;
+
+  const connect = () => link.mutate(undefined, { onSuccess: ({ url }) => { setWaiting(true); setNote(''); window.open(url, '_blank', 'noopener'); } });
+  const who = data.username ? ` · ${data.username.startsWith('@') ? data.username : `@${data.username}`}` : '';
+  const status = note || (waiting ? 'Abre Telegram y pulsa «Iniciar»…'
+    : data.linked ? (data.enabled ? `Conectado${who}` : `En pausa${who}`) : 'Recibe tus avisos en el chat');
+  const dot: Dot = waiting ? 'wait' : data.linked && data.enabled ? 'on' : 'off';
+  return (
+    <Channel icon={waiting ? <span className={styles.spinWrap}><TelegramLogo /><Loader2 size={16} className={styles.spin} /></span> : <TelegramLogo />} title="Telegram" status={status} dot={dot}>
+      {!data.linked && !waiting && <button type="button" className={styles.primary} onClick={connect} disabled={link.isPending}>Conectar</button>}
+      {waiting && <button type="button" className={styles.ghost} onClick={connect}>Abrir otra vez</button>}
+      {data.linked && (
+        <>
+          <button type="button" className={styles.ghost} disabled={test.isPending}
+            onClick={() => test.mutate(undefined, { onSuccess: () => setNote('Mensaje de prueba enviado'), onError: () => setNote('No se pudo enviar la prueba') })}>Probar</button>
+          <button type="button" className={styles.ghost} onClick={() => enabled.mutate(!data.enabled)}>{data.enabled ? 'Pausar' : 'Reanudar'}</button>
+          <button type="button" className={styles.ghost} onClick={() => { unlink.mutate(undefined); setNote(''); }}>Desconectar</button>
+        </>
+      )}
+    </Channel>
+  );
+}
+
+/** Avisos del sistema cuando Academic Hub está abierto en otra pestaña. */
 function BrowserAlerts() {
   const supported = typeof Notification !== 'undefined';
   const [permission, setPermission] = useState<NotificationPermission>(supported ? Notification.permission : 'denied');
   const allowed = supported && browserAlertsAllowed();
   const ask = async () => { if (supported) setPermission(await Notification.requestPermission()); };
-  const text = !supported ? 'Tu navegador no admite avisos del sistema'
-    : permission === 'granted' ? 'Avisos del navegador activados'
-      : permission === 'denied' ? 'Avisos del navegador bloqueados (permítelos en el candado)'
-        : 'Recibe avisos aunque estés en otra pestaña';
+  const status = !supported ? 'Tu navegador no los admite'
+    : permission === 'granted' ? 'Activados en este navegador'
+      : permission === 'denied' ? 'Bloqueados: permítelos en el candado' : 'Avisos aunque estés en otra pestaña';
   return (
-    <div className={cx(styles.alerts, allowed && styles.alertsOn)}>
-      <span className={styles.alertsIcon} aria-hidden="true">{allowed ? <BellRing size={16} /> : <BellOff size={16} />}</span>
-      <span className={styles.alertsText}>{text}</span>
-      {supported && permission === 'default' && <button type="button" className={styles.alertsButton} onClick={() => { void ask(); }}>Activar</button>}
-    </div>
+    <Channel icon={<span className={cx(styles.bellIcon, allowed && styles.bellOn)}>{allowed ? <BellRing size={22} /> : <BellOff size={22} />}</span>} title="Navegador" status={status} dot={allowed ? 'on' : 'off'}>
+      {supported && permission === 'default' && <button type="button" className={styles.primary} onClick={() => { void ask(); }}>Activar</button>}
+    </Channel>
   );
 }
 
@@ -93,8 +149,12 @@ export function NotificationsPage() {
           <h1 className={styles.heading}>Notificaciones</h1>
           <p className={styles.lede}>Entregas por vencer, guías y tareas listas, actividades nuevas, notas y anuncios.</p>
         </motion.div>
-        <BrowserAlerts />
       </header>
+
+      <section className={styles.channels} aria-label="Dónde recibir los avisos">
+        <TelegramConnect />
+        <BrowserAlerts />
+      </section>
 
       <Card padded={false} className={styles.panel}>
         <div className={styles.toolbar}>

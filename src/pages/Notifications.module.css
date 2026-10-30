@@ -5,13 +5,6 @@
 .heading { margin: 0; font-size: var(--fs-title); font-weight: 800; letter-spacing: -0.025em; }
 .lede { margin: 6px 0 0; max-width: 52ch; font-size: var(--fs-body); color: var(--muted); }
 
-.alerts { display: inline-flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: var(--radius-pill); background: var(--surface); box-shadow: var(--shadow-card); font-size: 12.5px; font-weight: 600; color: var(--muted); }
-.alertsIcon { display: grid; flex: none; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--panel-row); color: var(--muted); }
-.alertsOn .alertsIcon { background: var(--accent-soft); color: var(--accent-ink); }
-.alertsText { padding-right: 6px; }
-.alertsButton { min-height: 30px; padding: 0 14px; border: 0; border-radius: var(--radius-pill); background: var(--text); color: var(--inverse); font: inherit; font-size: 12.5px; font-weight: 800; cursor: pointer; transition: background-color var(--t-fast) var(--ease-out); }
-.alertsButton:hover { background: var(--accent); }
-.alertsButton:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 
 .panel { overflow: hidden; }
 .toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 14px; padding: 12px 14px; border-bottom: 1px solid var(--border); }
@@ -60,7 +53,31 @@
 @media (max-width: 700px) {
   .chips { grid-template-columns: minmax(0, 1fr); }
 }
-@media (max-width: 581px) {
-  .alerts { width: 100%; }
-  .alertsText { flex: 1; }
-}
+
+/* Canales de aviso: dos tarjetas iguales, con logo, estado y acciones */
+.channels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 14px; }
+.channel { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 14px; padding: 14px 16px; border-radius: 20px; background: var(--surface); box-shadow: var(--shadow-card); transition: box-shadow var(--t-base) var(--ease-out), transform var(--t-base) var(--ease-out); }
+.channel:hover { transform: translateY(-1px); box-shadow: var(--shadow-lift); }
+.channelIcon { display: grid; flex: none; place-items: center; width: 46px; height: 46px; }
+.channelText { display: grid; flex: 1; gap: 2px; min-width: 130px; line-height: 1.3; }
+.channelText b { font-size: 14.5px; font-weight: 800; }
+.channelText small { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--muted); }
+.dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: #c9c8c2; }
+.dot-on { background: var(--ok); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ok) 22%, transparent); }
+.dot-wait { background: var(--st-pending); animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: 0.35; } }
+.channelActions { display: flex; flex-wrap: wrap; gap: 6px; }
+.primary { min-height: 34px; padding: 0 18px; border: 0; border-radius: var(--radius-pill); background: var(--text); color: var(--inverse); font: inherit; font-size: 12.5px; font-weight: 800; cursor: pointer; transition: background-color var(--t-fast) var(--ease-out); }
+.primary:hover:not(:disabled) { background: var(--accent); }
+.primary:disabled { opacity: 0.6; cursor: default; }
+.ghost { min-height: 32px; padding: 0 13px; border: 0; border-radius: var(--radius-pill); background: var(--panel-row); color: var(--text); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; transition: background-color var(--t-fast) var(--ease-out); }
+.ghost:hover:not(:disabled) { background: var(--border); }
+.ghost:disabled { opacity: 0.5; cursor: default; }
+.primary:focus-visible, .ghost:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.bellIcon { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; background: var(--panel-row); color: var(--muted); }
+.bellOn { background: var(--accent-soft); color: var(--accent-ink); }
+.spinWrap { position: relative; display: grid; place-items: center; }
+.spinWrap .spin { position: absolute; color: #fff; }
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (max-width: 760px) { .channels { grid-template-columns: minmax(0, 1fr); } }

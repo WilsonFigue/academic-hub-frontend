@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError, api } from './client';
 import type {
-  Activity, ActivityGuide, NotificationList, NotificationKind, Attempt, ContentPreview, CalendarItem, Change, ContentItem, Course, Dashboard, EvaluationCycles, EvaluationOverviewTerm, StudyGuideCourse, StudyGuideState, HomeworkState, ForumState, ForumSuggestionResponse, PublicUser, SaveCyclesInput, SessionResponse, Term, UniversityAccount,
+  Activity, ActivityGuide, NotificationList, NotificationKind, TelegramStatus, Attempt, ContentPreview, CalendarItem, Change, ContentItem, Course, Dashboard, EvaluationCycles, EvaluationOverviewTerm, StudyGuideCourse, StudyGuideState, HomeworkState, ForumState, ForumSuggestionResponse, PublicUser, SaveCyclesInput, SessionResponse, Term, UniversityAccount,
 } from './types';
 
 export const keys = {
@@ -280,3 +280,19 @@ export function useSetNotificationPreferences() {
     onSuccess: (data) => { client.setQueryData(['notification-preferences'], data); },
   });
 }
+
+/** Conexión con Telegram. Mientras se espera a que la persona pulse «Iniciar» en el bot, consulta cada 3 s. */
+export const useTelegram = (waiting = false) =>
+  useQuery({ queryKey: ['telegram'], queryFn: () => api<TelegramStatus>('/notifications/telegram'), refetchOnWindowFocus: true, refetchInterval: waiting ? 3000 : false });
+
+const telegramMutation = <TInput = void>(path: string, body?: (input: TInput) => unknown) => () => {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (input: TInput) => api<Record<string, unknown>>(path, { method: 'POST', body: body ? body(input) : {} }),
+    onSettled: () => { void client.invalidateQueries({ queryKey: ['telegram'] }); },
+  });
+};
+export const useTelegramLink = () => useMutation({ mutationFn: () => api<{ url: string; expiresAt: string }>('/notifications/telegram/link', { method: 'POST', body: {} }) });
+export const useTelegramUnlink = telegramMutation('/notifications/telegram/unlink');
+export const useTelegramTest = () => useMutation({ mutationFn: () => api<{ sent: boolean }>('/notifications/telegram/test', { method: 'POST', body: {} }) });
+export const useTelegramEnabled = telegramMutation<boolean>('/notifications/telegram/enabled', (enabled) => ({ enabled }));

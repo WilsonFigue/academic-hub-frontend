@@ -319,3 +319,6 @@ export interface AppNotification {
   courseId: string | null; activityId: string | null; link: string | null; createdAt: string; readAt: string | null;
 }
 export interface NotificationList { notifications: AppNotification[]; unread: number; nextCursor: string | null }
+
+/** Estado de la conexión con Telegram (avisos por el bot). */
+export interface TelegramStatus { configured: boolean; botUsername: string | null; linked: boolean; enabled: boolean; username: string | null }
