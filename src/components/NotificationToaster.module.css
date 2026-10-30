@@ -1,0 +1,19 @@
+/* Avisos nuevos: tarjetas abajo a la derecha (sobre el dock en móvil). */
+.stack { position: fixed; right: 20px; bottom: 20px; z-index: var(--z-sheet); display: grid; gap: 10px; width: min(380px, calc(100vw - 24px)); pointer-events: none; }
+.toast { position: relative; display: flex; align-items: flex-start; gap: 4px; overflow: hidden; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); box-shadow: var(--shadow-lift); pointer-events: auto; }
+.body { display: flex; flex: 1; align-items: flex-start; gap: 12px; min-width: 0; padding: 13px 4px 15px 14px; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.body:focus-visible { outline: none; box-shadow: inset var(--focus-ring); }
+.icon { display: grid; flex: none; place-items: center; width: 38px; height: 38px; border-radius: 13px; background: color-mix(in srgb, var(--k) 16%, var(--surface)); color: var(--k); }
+.text { display: grid; gap: 2px; min-width: 0; line-height: 1.35; }
+.text b { font-size: 13.5px; font-weight: 800; overflow-wrap: anywhere; }
+.text small { font-size: 12.5px; color: var(--muted); overflow-wrap: anywhere; }
+.close { display: grid; flex: none; place-items: center; width: 30px; height: 30px; margin: 8px 8px 0 0; border: 0; border-radius: 10px; background: transparent; color: var(--faint); cursor: pointer; }
+.close:hover { background: var(--panel-row); color: var(--text); }
+.close:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.bar { position: absolute; right: 0; bottom: 0; left: 0; height: 3px; background: var(--k); transform-origin: left; animation: drain linear forwards; }
+@keyframes drain { to { transform: scaleX(0); } }
+
+@media (max-width: 768px) {
+  .stack { right: 12px; bottom: 96px; }
+}
+@media (prefers-reduced-motion: reduce) { .bar { animation: none; display: none; } }

@@ -291,6 +291,15 @@ export function ActivitiesPage() {
     }), 500);
   };
   useEffect(() => () => window.clearTimeout(timer.current), []);
+  // Enlace desde una notificación: abre directamente la actividad indicada.
+  useEffect(() => {
+    const id = params.get('abrir');
+    if (!id) return;
+    setSelected({ id } as Activity);
+    const next = new URLSearchParams(params);
+    next.delete('abrir');
+    setParams(next, { replace: true });
+  }, [params, setParams]);
   const toggleIn = (set: Set<StatusKey>, key: StatusKey) => { const n = new Set(set); if (n.has(key)) n.delete(key); else n.add(key); return n; };
   const shownOrder = layout.order.filter((k) => !layout.hidden.has(k));
   const move = (key: StatusKey, delta: -1 | 1) => {

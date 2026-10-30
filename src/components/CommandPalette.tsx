@@ -1,6 +1,6 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { Command } from 'cmdk';
-import { ArrowDown, ArrowUp, BellRing, BookOpen, CalendarDays, ClipboardList, CornerDownLeft, GraduationCap, House, Search, SearchX, UserRound, X } from 'lucide-react';
+import { ArrowDown, ArrowUp, Bell, BellRing, BookOpen, CalendarDays, ClipboardList, CornerDownLeft, GraduationCap, House, Search, SearchX, UserRound, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useActivities, useCourses } from '../api/hooks';
@@ -17,6 +17,7 @@ const PAGES = [
   { to: '/calendar', label: 'Calendario', hint: 'Mes, semana y agenda', icon: CalendarDays },
   { to: '/grades', label: 'Calificaciones', hint: 'Notas por materia', icon: BookOpen },
   { to: '/updates', label: 'Novedades', hint: 'Cambios en tu campus', icon: BellRing },
+  { to: '/notifications', label: 'Notificaciones', hint: 'Avisos y preferencias', icon: Bell },
   { to: '/profile', label: 'Mi perfil', hint: 'Cuenta y vinculación', icon: UserRound },
 ];
 

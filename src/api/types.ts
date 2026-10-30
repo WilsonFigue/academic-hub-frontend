@@ -311,3 +311,11 @@ export interface HomeworkState { activityId: string; courseEnabled: boolean; eli
 export interface ForumSuggestion { postText: string; replies: Array<{ to: string; full?: string; text: string }>; promptSource: 'teacher_post' | 'pasted' | 'title_only'; model: string | null; costUsd: number | null; updatedAt: string }
 export type ForumState = { isForum: false } | { isForum: true; title: string; dueAt: string | null; graded: boolean; participated?: boolean | null; prompt: string | null; promptStatus?: string; availability?: { available: boolean; windows: Array<{ start: string | null; end: string | null }> } | null; canReadLive: boolean; aiConfigured: boolean; suggestion: ForumSuggestion | null };
 export interface ForumSuggestionResponse { suggestion: ForumSuggestion; promptStatus: string; repliesRead: number }
+
+/** Notificaciones (campana). `link` es siempre una ruta interna de la app. */
+export type NotificationKind = 'guide_ready' | 'homework_ready' | 'activity_new' | 'due_changed' | 'due_tomorrow' | 'due_today' | 'due_soon' | 'grade_new' | 'grade_changed' | 'announcement_new';
+export interface AppNotification {
+  id: string; kind: NotificationKind; severity: 'info' | 'success' | 'warning' | 'urgent'; title: string; body: string | null;
+  courseId: string | null; activityId: string | null; link: string | null; createdAt: string; readAt: string | null;
+}
+export interface NotificationList { notifications: AppNotification[]; unread: number; nextCursor: string | null }

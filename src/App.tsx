@@ -18,6 +18,7 @@ import { ProfilePage } from './pages/ProfilePage';
 // Secciones menos frecuentes: se cargan al visitarlas (reduce el paquete inicial).
 const CalendarPage = lazy(() => import('./pages/CalendarPage').then((m) => ({ default: m.CalendarPage })));
 const GradesPage = lazy(() => import('./pages/GradesPage').then((m) => ({ default: m.GradesPage })));
+const NotificationsPage = lazy(() => import('./pages/NotificationsPage').then((m) => ({ default: m.NotificationsPage })));
 const UpdatesPage = lazy(() => import('./pages/UpdatesPage').then((m) => ({ default: m.UpdatesPage })));
 
 function Splash() {
@@ -75,6 +76,7 @@ export function App() {
               <Route path="/calendar" element={<CalendarPage />} />
               <Route path="/grades" element={<GradesPage />} />
               <Route path="/updates" element={<UpdatesPage />} />
+              <Route path="/notifications" element={<NotificationsPage />} />
               <Route path="/profile" element={<ProfilePage />} />
             </Route>
           </Route>

@@ -1,4 +1,4 @@
-import { BellRing, Menu, RefreshCw, Search } from 'lucide-react';
+import { Menu, RefreshCw, Search } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -7,6 +7,7 @@ import { capitalize, dayFromKey, dayKey, formatRelative, formatDateTime } from '
 import { useReducedMotion } from '../lib/motion';
 import type { Tone } from '../lib/status';
 import { LogoMark } from './Logo';
+import { NotificationBell } from './NotificationCenter';
 import styles from './TopBar.module.css';
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -22,8 +23,8 @@ const DAY_MS = 86_400_000;
  * estado de la última importación y campana con el número real de novedades. Entra deslizándose, se compacta al hacer
  * scroll y todo lo interactivo responde al mouse.
  */
-export function TopBar({ term, institution, lastImport, syncLabel, syncTone, news, onSearch, onMenu, menuOpen }: {
-  term?: Term; institution?: string; lastImport: string | null; syncLabel: string; syncTone: Tone; news: number;
+export function TopBar({ term, institution, lastImport, syncLabel, syncTone, onSearch, onMenu, menuOpen }: {
+  term?: Term; institution?: string; lastImport: string | null; syncLabel: string; syncTone: Tone;
   onSearch: () => void; onMenu: () => void; menuOpen: boolean;
 }) {
   const reduce = useReducedMotion();
@@ -45,7 +46,6 @@ export function TopBar({ term, institution, lastImport, syncLabel, syncTone, new
   const weeks = Number.isFinite(start) && Number.isFinite(end) ? Math.max(1, Math.ceil((end - start) / (7 * DAY_MS))) : 0;
   const week = weeks ? Math.min(weeks, Math.max(1, Math.ceil((Date.now() - start) / (7 * DAY_MS)))) : 0;
   const part = (delay: number) => ({ initial: reduce ? false : { opacity: 0, y: -14 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.5, delay, ease } });
-  const badge = news > 9 ? '9+' : String(news);
 
   return (
     <motion.header className={cx(styles.bar, scrolled && styles.scrolled)} initial={reduce ? false : { y: -72, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.55, ease }}>
@@ -82,12 +82,7 @@ export function TopBar({ term, institution, lastImport, syncLabel, syncTone, new
           <RefreshCw size={14} aria-hidden="true" />{lastImport ? `Datos ${formatRelative(lastImport)}` : syncLabel}
         </motion.span>
         <motion.div {...part(0.34)}>
-          <Link to="/updates" className={styles.bell} aria-label={news > 0 ? `Novedades: ${news}` : 'Novedades'}>
-            <BellRing size={20} aria-hidden="true" />
-            <AnimatePresence>
-              {news > 0 && <motion.span className={styles.badge} aria-hidden="true" initial={reduce ? false : { scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={{ type: 'spring', stiffness: 520, damping: 22, delay: 0.7 }}>{badge}</motion.span>}
-            </AnimatePresence>
-          </Link>
+          <NotificationBell />
         </motion.div>
         <motion.button type="button" className={cx(styles.bell, styles.menu)} onClick={onMenu} aria-label="Abrir menú" aria-expanded={menuOpen} {...part(0.4)}>
           <Menu size={22} aria-hidden="true" />

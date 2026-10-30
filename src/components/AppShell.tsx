@@ -1,5 +1,5 @@
 import {
-  BellRing, BookOpen, CalendarDays, ClipboardList, GraduationCap, House, LogOut, Menu, UserRound, X, type LucideIcon,
+  Bell, BellRing, BookOpen, CalendarDays, ClipboardList, GraduationCap, House, LogOut, Menu, UserRound, X, type LucideIcon,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useReducedMotion } from '../lib/motion';
@@ -9,6 +9,7 @@ import { useDashboard, useLogout, useMe, useSession, useTerms } from '../api/hoo
 import { syncStatus } from '../lib/status';
 import { CommandPalette } from './CommandPalette';
 import { TopBar } from './TopBar';
+import { NotificationToaster } from './NotificationToaster';
 import { cycleCode } from '../lib/format';
 import { SideRail } from './SideRail';
 import styles from './AppShell.module.css';
@@ -93,7 +94,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
         {/* Barra superior */}
         <TopBar term={term} institution={account?.institutionCode} lastImport={lastImport} syncLabel={sync.label} syncTone={sync.tone}
-          news={dashboard.data?.recentChanges.length ?? 0} onSearch={() => setPalette(true)} onMenu={() => setSheet(true)} menuOpen={sheet} />
+          onSearch={() => setPalette(true)} onMenu={() => setSheet(true)} menuOpen={sheet} />
 
         {/* Hoja de navegación (≤1100) */}
         <AnimatePresence>
@@ -112,7 +113,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   <button type="button" className={styles.iconButton} onClick={() => setSheet(false)} aria-label="Cerrar"><X size={20} aria-hidden="true" /></button>
                 </div>
                 <div className={styles.sheetItems}>
-                  {[...PRIMARY, { to: '/profile', label: 'Mi perfil', icon: UserRound }].map((item) => (
+                  {[...PRIMARY, { to: '/notifications', label: 'Notificaciones', icon: Bell }, { to: '/profile', label: 'Mi perfil', icon: UserRound }].map((item) => (
                     <SheetLink key={item.to} item={item} active={isActive(item.to)} onClick={() => setSheet(false)} />
                   ))}
                 </div>
@@ -150,6 +151,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </main>
 
         <CommandPalette open={palette} onOpenChange={setPalette} />
+        <NotificationToaster />
       </div>
   );
 }

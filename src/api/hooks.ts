@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError, api } from './client';
 import type {
-  Activity, ActivityGuide, Attempt, ContentPreview, CalendarItem, Change, ContentItem, Course, Dashboard, EvaluationCycles, EvaluationOverviewTerm, StudyGuideCourse, StudyGuideState, HomeworkState, ForumState, ForumSuggestionResponse, PublicUser, SaveCyclesInput, SessionResponse, Term, UniversityAccount,
+  Activity, ActivityGuide, NotificationList, NotificationKind, Attempt, ContentPreview, CalendarItem, Change, ContentItem, Course, Dashboard, EvaluationCycles, EvaluationOverviewTerm, StudyGuideCourse, StudyGuideState, HomeworkState, ForumState, ForumSuggestionResponse, PublicUser, SaveCyclesInput, SessionResponse, Term, UniversityAccount,
 } from './types';
 
 export const keys = {
@@ -238,3 +238,45 @@ export function useForumSuggestion(base: string) {
 
 /** Archivo de una tarea: los PDF se abren en el visor del navegador; los demás se descargan. */
 export const homeworkFileUrl = (activityId: string, name: string) => `/api/v1/activities/${activityId}/homework/files/${encodeURIComponent(name)}`;
+
+/** Bandeja de notificaciones. Se refresca sola cada minuto y al volver a la pestaña; al pedirla el servidor recalcula los recordatorios de entrega. */
+export const useNotifications = (options: { unreadOnly?: boolean; limit?: number } = {}) =>
+  useQuery({
+    queryKey: ['notifications', options.unreadOnly ? 'unread' : 'all', options.limit ?? 30],
+    queryFn: () => api<NotificationList>(`/notifications?limit=${options.limit ?? 30}${options.unreadOnly ? '&unread=1' : ''}`),
+    refetchInterval: 60_000,
+    refetchOnWindowFocus: true,
+    staleTime: 20_000,
+  });
+
+const refreshNotifications = (client: ReturnType<typeof useQueryClient>) => client.invalidateQueries({ queryKey: ['notifications'] });
+
+/** Marca avisos como leídos (ids) o todos. */
+export function useMarkNotificationsRead() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (target: { ids?: string[]; all?: boolean }) => api<{ unread: number }>('/notifications/read', { method: 'POST', body: target }),
+    onSettled: () => { void refreshNotifications(client); },
+  });
+}
+
+/** Quita avisos de la bandeja. */
+export function useDismissNotifications() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (target: { ids?: string[]; all?: boolean }) => api<{ unread: number }>('/notifications/dismiss', { method: 'POST', body: target }),
+    onSettled: () => { void refreshNotifications(client); },
+  });
+}
+
+/** Tipos de aviso que el estudiante silenció. */
+export const useNotificationPreferences = () =>
+  useQuery({ queryKey: ['notification-preferences'], queryFn: () => api<{ kinds: NotificationKind[]; muted: NotificationKind[] }>('/notifications/preferences') });
+
+export function useSetNotificationPreferences() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (muted: NotificationKind[]) => api<{ kinds: NotificationKind[]; muted: NotificationKind[] }>('/notifications/preferences', { method: 'PUT', body: { muted } }),
+    onSuccess: (data) => { client.setQueryData(['notification-preferences'], data); },
+  });
+}
