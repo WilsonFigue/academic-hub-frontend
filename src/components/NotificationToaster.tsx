@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useMarkNotificationsRead, useNotifications } from '../api/hooks';
 import type { AppNotification } from '../api/types';
 import { KIND_META } from '../lib/notificationKinds';
-import { prettyBody, prettyTitle } from '../lib/notificationText';
+import { parseBody, prettyBody, prettyTitle } from '../lib/notificationText';
+import { tintFor } from '../lib/tint';
 import { useReducedMotion } from '../lib/motion';
 import { useOpenNotification } from './NotificationCenter';
 import styles from './NotificationToaster.module.css';
@@ -65,12 +66,23 @@ export function NotificationToaster() {
         {toasts.map((n) => {
           const meta = KIND_META[n.kind];
           const Icon = meta.icon;
+          const { lead, course, tags } = parseBody(n.body);
           return (
-            <motion.div key={n.id} layout={!reduce} className={styles.toast} style={{ ['--k' as string]: meta.color }}
+            <motion.div key={n.id} layout={!reduce} className={styles.toast} style={{ ['--k' as string]: meta.color, ['--course' as string]: tintFor(n.courseId).fg }}
               initial={reduce ? false : { opacity: 0, y: 28, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, x: 40, scale: 0.96 }} transition={{ duration: 0.34, ease }}>
               <button type="button" className={styles.body} onClick={() => { close(n.id); open(n); }}>
                 <span className={styles.icon} aria-hidden="true"><Icon size={18} /></span>
-                <span className={styles.text}><b>{prettyTitle(n.title)}</b>{n.body && <small>{prettyBody(n.body)}</small>}</span>
+                <span className={styles.text}>
+                  <em className={styles.kind}>{meta.label}</em>
+                  <b>{prettyTitle(n.title)}</b>
+                  {lead && <small>{lead}</small>}
+                  {(course || tags.length > 0) && (
+                    <span className={styles.chips}>
+                      {course && <span className={styles.course}><i aria-hidden="true" />{course}</span>}
+                      {tags.map((tag) => <span key={tag} className={styles.tag}>{tag}</span>)}
+                    </span>
+                  )}
+                </span>
               </button>
               <button type="button" className={styles.close} onClick={() => { close(n.id); read.mutate({ ids: [n.id] }); }} aria-label="Cerrar aviso"><X size={15} aria-hidden="true" /></button>
               <i className={styles.bar} style={{ animationDuration: `${SHOW_MS}ms` }} aria-hidden="true" />
