@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useMarkNotificationsRead, useNotifications } from '../api/hooks';
 import type { AppNotification } from '../api/types';
 import { KIND_META } from '../lib/notificationKinds';
+import { prettyBody, prettyTitle } from '../lib/notificationText';
 import { useReducedMotion } from '../lib/motion';
 import { useOpenNotification } from './NotificationCenter';
 import styles from './NotificationToaster.module.css';
@@ -43,7 +44,7 @@ export function NotificationToaster() {
     if (browserAlertsAllowed() && document.visibilityState === 'hidden') {
       for (const n of fresh) {
         try {
-          const alert = new Notification(n.title, { body: n.body ?? undefined, tag: n.id, icon: '/favicon.svg' });
+          const alert = new Notification(prettyTitle(n.title), { body: prettyBody(n.body) ?? undefined, tag: n.id, icon: '/favicon.svg' });
           alert.onclick = () => { window.focus(); open(n); alert.close(); };
         } catch { /* el navegador no deja avisar */ }
       }
@@ -69,7 +70,7 @@ export function NotificationToaster() {
               initial={reduce ? false : { opacity: 0, y: 28, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, x: 40, scale: 0.96 }} transition={{ duration: 0.34, ease }}>
               <button type="button" className={styles.body} onClick={() => { close(n.id); open(n); }}>
                 <span className={styles.icon} aria-hidden="true"><Icon size={18} /></span>
-                <span className={styles.text}><b>{n.title}</b>{n.body && <small>{n.body}</small>}</span>
+                <span className={styles.text}><b>{prettyTitle(n.title)}</b>{n.body && <small>{prettyBody(n.body)}</small>}</span>
               </button>
               <button type="button" className={styles.close} onClick={() => { close(n.id); read.mutate({ ids: [n.id] }); }} aria-label="Cerrar aviso"><X size={15} aria-hidden="true" /></button>
               <i className={styles.bar} style={{ animationDuration: `${SHOW_MS}ms` }} aria-hidden="true" />

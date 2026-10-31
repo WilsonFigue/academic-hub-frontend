@@ -1,9 +1,9 @@
 import { Bell, BellOff, BellRing, Check, CheckCheck, ChevronDown, Loader2, Settings2, Trash2 } from 'lucide-react';
-import { AnimatePresence, motion } from 'motion/react';
+import { motion } from 'motion/react';
 import { useEffect, useState, type ReactNode } from 'react';
 import { useDismissNotifications, useMarkNotificationsRead, useNotificationPreferences, useNotifications, useSetNotificationPreferences, useTelegram, useTelegramEnabled, useTelegramLink, useTelegramTest, useTelegramUnlink } from '../api/hooks';
 import type { NotificationKind } from '../api/types';
-import { NotificationItem, useOpenNotification } from '../components/NotificationCenter';
+import { NotificationGroups, useOpenNotification } from '../components/NotificationCenter';
 import { browserAlertsAllowed } from '../components/NotificationToaster';
 import { Button, Card, Skeleton } from '../components/ui';
 import { KIND_GROUPS, KIND_META } from '../lib/notificationKinds';
@@ -182,11 +182,9 @@ export function NotificationsPage() {
             <div><b>{onlyUnread ? 'No tienes nada sin leer' : 'Todo al día'}</b><small>Aquí aparecerán tus entregas por vencer, guías listas y notas nuevas.</small></div>
           </div>
         ) : (
-          <ul className={styles.list}>
-            <AnimatePresence initial={false}>
-              {items.map((item, i) => <NotificationItem key={item.id} item={item} index={i} onOpen={open} onDismiss={(n) => dismiss.mutate({ ids: [n.id] })} />)}
-            </AnimatePresence>
-          </ul>
+          <div className={styles.feed}>
+            <NotificationGroups items={items} onOpen={open} onDismiss={(n) => dismiss.mutate({ ids: [n.id] })} />
+          </div>
         )}
 
         <Preferences />
