@@ -32,6 +32,13 @@
 .block { --k: var(--accent); margin: 0; padding: 14px 16px; border-radius: 22px; background: color-mix(in srgb, var(--k) 8%, var(--panel-row)); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--k) 18%, transparent); }
 .block[data-status='ready'] { --k: var(--ok); }
 .block[data-status='failed'] { --k: var(--bad); }
+.block[data-status='empty'] { --k: var(--muted); background: var(--panel-row); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--muted) 16%, transparent); }
+.reason { display: grid; gap: 12px; margin-top: 12px; padding: 12px 14px; border-radius: 16px; background: var(--surface); }
+.reason p { display: grid; gap: 2px; margin: 0; font-size: 13.5px; line-height: 1.45; color: var(--text); }
+.reason p b { font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.reasonFoot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 14px; }
+.reasonFoot small { flex: 1 1 180px; font-size: 12px; color: var(--muted); }
+.reasonFoot .secondary { min-height: 36px; padding: 0 14px; font-size: 13px; background: var(--panel-row); }
 .block[data-status='requested'], .block[data-status='generating'] { --k: var(--st-pending); }
 .blockHead { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 14px; }
 .blockIcon { display: grid; flex: none; place-items: center; width: 42px; height: 42px; border-radius: 15px; background: color-mix(in srgb, var(--k) 16%, var(--surface)); color: var(--k); }

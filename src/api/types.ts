@@ -290,7 +290,7 @@ export interface StudyGuideContent {
 }
 export interface StudyGuide {
   id: string; status: 'requested' | 'generating' | 'ready' | 'failed'; trigger: 'manual' | 'routine';
-  content: StudyGuideContent | null; model: string | null; errorCode: string | null; requestedAt: string; finishedAt: string | null;
+  content: StudyGuideContent | null; model: string | null; errorCode: string | null; errorDetail?: string | null; requestedAt: string; finishedAt: string | null;
   /** Herramientas que la actividad pide usar (p. ej. 'geogebra'). */
   tools: string[];
 }

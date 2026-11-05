@@ -1,4 +1,4 @@
-import { ArrowUpRight, BookOpenCheck, Clock3, Loader2, RotateCcw, Sparkles, TriangleAlert } from 'lucide-react';
+import { ArrowUpRight, BookOpenCheck, Clock3, FileSearch, Loader2, RotateCcw, Sparkles, TriangleAlert } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { ApiError } from '../api/client';
@@ -76,27 +76,31 @@ export function StudyGuideBlock({ activityId }: { activityId: string }) {
   const request = useRequestStudyGuide(activityId);
   if (isPending || !data) return <Skeleton height={86} radius={20} />;
   const guide = data.guide;
+  const noMaterial = guide?.status === 'failed' && guide.errorCode === 'no_material';
+  // El motivo viene del servidor tras los dos puntos ("Esta actividad no tiene material…: se hace fuera de Blackboard…").
+  const noMaterialReason = guide?.errorDetail?.split(': ').slice(1).join(': ') || 'Blackboard no trae archivos de la materia relacionados con ella. Si el profesor los sube, usa «Volver a revisar».';
   const requestError = request.error instanceof ApiError && request.error.code !== 'study_guide_exists' ? request.error.message : null;
 
   return (
-    <div className={styles.block} data-status={guide?.status ?? 'none'}>
+    <div className={styles.block} data-status={noMaterial ? 'empty' : guide?.status ?? 'none'}>
       <div className={styles.blockHead}>
         <span className={styles.blockIcon} aria-hidden="true">
-          {guide?.status === 'generating' ? <Loader2 size={20} className={styles.spin} /> : guide?.status === 'requested' ? <Clock3 size={20} /> : guide?.status === 'failed' ? <TriangleAlert size={20} /> : guide?.status === 'ready' ? <BookOpenCheck size={20} /> : <Sparkles size={20} />}
+          {guide?.status === 'generating' ? <Loader2 size={20} className={styles.spin} /> : guide?.status === 'requested' ? <Clock3 size={20} /> : guide?.status === 'failed' ? (noMaterial ? <FileSearch size={20} /> : <TriangleAlert size={20} />) : guide?.status === 'ready' ? <BookOpenCheck size={20} /> : <Sparkles size={20} />}
         </span>
         <span className={styles.blockText}>
           {!guide && (<><b>Guía de estudio con IA</b><small>{data.courseEnabled ? 'Esta materia las genera sola; también puedes pedir esta ahora.' : 'Esta materia no genera guías sola: esta se hará solo si la pides.'}</small></>)}
           {guide?.status === 'requested' && (<><b>Guía en cola</b><small>Se generará en cuanto la IA esté disponible. {guide.trigger === 'routine' ? 'La pidió la rutina de esta materia.' : 'La pediste tú.'}</small></>)}
           {guide?.status === 'generating' && (<><b>Generando tu guía…</b><small>Puede tardar un minuto. Puedes cerrar esta ventana.</small></>)}
           {guide?.status === 'ready' && (<><b>Guía de estudio lista</b><small>Armada con el material de la materia. Revisa siempre las fuentes citadas.</small></>)}
-          {guide?.status === 'failed' && (<><b>No pudimos generar la guía</b><small>Inténtalo de nuevo; no se cobra una guía que falló.</small></>)}
+          {guide?.status === 'failed' && noMaterial && (<><b>Sin material para armar la guía</b><small>Blackboard no tiene archivos que la IA pueda leer para esta actividad.</small></>)}
+          {guide?.status === 'failed' && !noMaterial && (<><b>No pudimos generar la guía</b><small>Inténtalo de nuevo; no se cobra una guía que falló.</small></>)}
         </span>
         {!guide && (
           <button type="button" className={styles.primary} disabled={request.isPending} onClick={() => request.mutate()}>
             {request.isPending ? <Loader2 size={16} className={styles.spin} aria-hidden="true" /> : <Sparkles size={16} aria-hidden="true" />}Generar guía
           </button>
         )}
-        {guide?.status === 'failed' && (
+        {guide?.status === 'failed' && !noMaterial && (
           <button type="button" className={styles.primary} disabled={request.isPending} onClick={() => request.mutate()}>
             {request.isPending ? <Loader2 size={16} className={styles.spin} aria-hidden="true" /> : <RotateCcw size={16} aria-hidden="true" />}Reintentar
           </button>
@@ -105,6 +109,17 @@ export function StudyGuideBlock({ activityId }: { activityId: string }) {
           <Link className={styles.primary} to={`/activities/${activityId}/guide`}>Ver guía<ArrowUpRight size={16} aria-hidden="true" /></Link>
         )}
       </div>
+      {noMaterial && (
+        <div className={styles.reason}>
+          <p><b>Motivo</b>{noMaterialReason.charAt(0).toUpperCase() + noMaterialReason.slice(1)}</p>
+          <div className={styles.reasonFoot}>
+            <small>¿El profesor subió material? Revísalo de nuevo; no tiene costo.</small>
+            <button type="button" className={styles.secondary} disabled={request.isPending} onClick={() => request.mutate()}>
+              {request.isPending ? <Loader2 size={15} className={styles.spin} aria-hidden="true" /> : <RotateCcw size={15} aria-hidden="true" />}Volver a revisar
+            </button>
+          </div>
+        </div>
+      )}
       {requestError && <p className={styles.error} role="alert">{requestError}</p>}
     </div>
   );
