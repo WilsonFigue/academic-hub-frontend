@@ -1,0 +1,16 @@
+/* Instalar la app / versión nueva: tarjeta abajo a la izquierda; en móvil, arriba para no tapar el dock ni los avisos. */
+.stack { position: fixed; bottom: 20px; left: 20px; z-index: var(--z-sheet); width: min(400px, calc(100vw - 24px)); }
+.card { display: flex; align-items: center; gap: 12px; padding: 12px 12px 12px 14px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); box-shadow: var(--shadow-lift); }
+.icon { display: grid; flex: none; place-items: center; width: 38px; height: 38px; border-radius: 13px; background: var(--panel-row); color: var(--text); }
+.text { display: grid; flex: 1; gap: 2px; min-width: 0; line-height: 1.35; }
+.text b { font-size: 14px; font-weight: 800; }
+.text small { font-size: 12.5px; color: var(--muted); }
+.action { flex: none; padding: 8px 14px; border: 0; border-radius: var(--radius-pill); background: var(--primary); color: #fff; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.action:hover { background: var(--primary-hover); }
+.action:focus-visible, .close:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.close { display: grid; flex: none; place-items: center; width: 30px; height: 30px; border: 0; border-radius: 10px; background: transparent; color: var(--muted); cursor: pointer; }
+.close:hover { background: var(--panel-row); color: var(--text); }
+
+@media (max-width: 768px) {
+  .stack { top: max(12px, env(safe-area-inset-top)); bottom: auto; left: 12px; }
+}

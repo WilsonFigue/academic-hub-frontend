@@ -4,6 +4,7 @@ import { BrowserRouter, Navigate, Outlet, Route, Routes, useNavigate } from 'rea
 import { onAuthProblem } from './api/client';
 import { keys, useSession } from './api/hooks';
 import { AppShell } from './components/AppShell';
+import { PwaPrompt } from './components/PwaPrompt';
 import { ActivitiesPage } from './pages/ActivitiesPage';
 import { ChangePasswordPage } from './pages/ChangePasswordPage';
 import { FilePage } from './pages/FilePage';
@@ -83,6 +84,7 @@ export function App() {
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </AuthEvents>
+      <PwaPrompt />
     </BrowserRouter>
   );
 }
